@@ -1,0 +1,32 @@
+<div class="stage-actions">
+    {% if enquiry.status == "new" %}
+        <button class="button stage-main-action" type="button" data-open-stage-dialog data-stage-action="book_assessment" data-enquiry-id="{{ enquiry.pk }}">Book assessment</button>
+    {% elif enquiry.status == "assessment_booked" %}
+        <button class="button stage-main-action" type="button" data-open-stage-dialog data-stage-action="mark_assessed" data-enquiry-id="{{ enquiry.pk }}">Mark assessed</button>
+    {% elif enquiry.status == "assessed" %}
+        <button class="button stage-main-action" type="button" data-open-stage-dialog data-stage-action="mark_started" data-enquiry-id="{{ enquiry.pk }}">Mark started</button>
+    {% endif %}
+    <details class="stage-menu">
+        <summary>More</summary>
+        <div class="stage-menu-options">
+            {% if enquiry.status == "not_proceeding" %}
+                <form method="post" action="{{ stage_post_url }}{% if filter_query %}?{{ filter_query }}{% endif %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="stage_action" value="reopen">
+                    <input type="hidden" name="enquiry_id" value="{{ enquiry.pk }}">
+                    <button type="submit">Reopen</button>
+                </form>
+            {% else %}
+                <button type="button" data-open-stage-dialog data-stage-action="not_proceeding" data-enquiry-id="{{ enquiry.pk }}">Not proceeding</button>
+            {% endif %}
+            {% if enquiry.status == "assessment_booked" or enquiry.status == "assessed" or enquiry.status == "started" %}
+                <form method="post" action="{{ stage_post_url }}{% if filter_query %}?{{ filter_query }}{% endif %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="stage_action" value="move_back">
+                    <input type="hidden" name="enquiry_id" value="{{ enquiry.pk }}">
+                    <button type="submit">Move back one stage</button>
+                </form>
+            {% endif %}
+        </div>
+    </details>
+</div>

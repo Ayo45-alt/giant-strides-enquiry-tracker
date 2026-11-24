@@ -1,0 +1,128 @@
+{% extends "tracker/base.html" %}
+
+{% block title %}Enquire About Classes{% endblock %}
+
+{% block content %}
+<section class="content-card form-card">
+    <h1 class="page-heading">Enquire About Classes</h1>
+    <p class="intro">Please fill in your child's details below. Our team will contact you to arrange an assessment.</p>
+    {% if whatsapp_number %}
+        <a class="whatsapp-help" href="https://wa.me/{{ whatsapp_number }}?text=Hello%20Mrs%20Ajayi%2C%20I%20have%20a%20question%20about%20the%20enquiry%20form." target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.300 1.200-1.800 1.200-.5.1-1 .2-3.300-.7-2.800-1.200-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 .9-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500l.8 2c.1.2.1.300 0 .5l-.3.400-.4.400c-.1.100-.3.300-.1.600.2.300.8 1.300 1.700 2.100 1.200 1 2.100 1.300 2.400 1.500.3.100.4.100.6-.1l.9-1.100c.2-.3.400-.2.600-.1l1.900.9c.3.100.5.200.5.300.1.200.1.800-.1 1.200z"/></svg>
+            Have a question? Chat with Mrs Ajayi on WhatsApp
+        </a>
+    {% endif %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <h2 class="section-title">Your details</h2>
+        <div class="form-grid">
+            {% for field in parent_fields %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required" aria-label="required">*</span>{% endif %}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="error-list">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="field child-count-field">
+                <label for="{{ child_count_field.id_for_label }}">{{ child_count_field.label }}{% if child_count_field.field.required %} <span class="required" aria-label="required">*</span>{% endif %}</label>
+                {{ child_count_field }}
+                <p class="help-text">Choose 1 if it is just one child.</p>
+                {% if child_count_field.errors %}
+                    <ul class="error-list">{% for error in child_count_field.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+        </div>
+        {% if parent_form.non_field_errors %}
+            <ul class="error-list">{% for error in parent_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% endif %}
+
+        <h2 class="section-title">Your child's details</h2>
+
+        {{ children.management_form }}
+        {% if children.non_form_errors %}
+            <ul class="error-list formset-errors">{% for error in children.non_form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% endif %}
+        <div class="child-panels" id="child-panels">
+            {% for child_form in children %}
+                <section class="child-panel{% if forloop.counter > selected_count %} is-hidden{% endif %}" data-child-panel data-child-index="{{ forloop.counter0 }}">
+                    <h3 class="child-panel-title" data-child-title{% if selected_count == 1 %} hidden{% endif %}>{% if selected_count > 1 %}Details for Child {{ forloop.counter }}{% endif %}</h3>
+                    <div class="form-grid">
+                        {% for field in child_form %}
+                            <div class="field{% if field.name == "subjects" or field.name == "class_days" or field.name == "class_time" or field.name == "preferred_assessment_date" %} field-wide{% endif %}">
+                                {% if field.name == "subjects" %}
+                                    <fieldset class="subject-fieldset">
+                                        <legend>{{ field.label }}{% if field.field.required %} <span class="required" aria-label="required">*</span>{% endif %}</legend>
+                                        <div class="subject-options">
+                                            {% for checkbox in field %}
+                                                <label class="subject-option">{{ checkbox.tag }}<span>{{ checkbox.choice_label }}</span></label>
+                                            {% empty %}
+                                                <p class="help-text">No subjects are currently available.</p>
+                                            {% endfor %}
+                                        </div>
+                                    </fieldset>
+                                {% elif field.name == "class_days" %}
+                                    <fieldset class="subject-fieldset">
+                                        <legend>{{ field.label }}</legend>
+                                        {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                                        <div class="day-options">
+                                            {% for checkbox in field %}
+                                                <label class="subject-option">{{ checkbox.tag }}<span>{{ checkbox.choice_label }}</span></label>
+                                            {% endfor %}
+                                        </div>
+                                    </fieldset>
+                                {% else %}
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required" aria-label="required">*</span>{% endif %}</label>
+                                    {% if field.name == "class_time" or field.name == "preferred_assessment_date" %}
+                                        <div class="inline-help">{{ field }}<p class="help-text">{{ field.help_text }}</p></div>
+                                    {% else %}
+                                        {{ field }}
+                                        {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                                    {% endif %}
+                                {% endif %}
+                                {% if field.errors %}
+                                    <ul class="error-list">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+
+        <div class="honeypot-field" aria-hidden="true">
+            <label for="{{ honeypot_field.id_for_label }}">Leave this field empty</label>
+            {{ honeypot_field }}
+        </div>
+        <div class="form-actions">
+            <button class="button" type="submit">Submit</button>
+        </div>
+    </form>
+</section>
+<script>
+    (function () {
+        const countSelect = document.getElementById("id_child_count");
+        const totalForms = document.querySelector('input[name="children-TOTAL_FORMS"]');
+        const panels = document.querySelectorAll("[data-child-panel]");
+
+        function updateChildSections() {
+            const count = Math.min(5, Math.max(1, Number.parseInt(countSelect.value, 10) || 1));
+            totalForms.value = count;
+            panels.forEach((panel, index) => {
+                const visible = index < count;
+                panel.classList.toggle("is-hidden", !visible);
+                panel.querySelectorAll("input, select, textarea").forEach((input) => {
+                    input.disabled = !visible;
+                });
+                const title = panel.querySelector("[data-child-title]");
+                title.textContent = count === 1 ? "" : `Details for Child ${index + 1}`;
+                title.hidden = count === 1;
+            });
+        }
+
+        countSelect.addEventListener("change", updateChildSections);
+        updateChildSections();
+    })();
+</script>
+{% endblock %}

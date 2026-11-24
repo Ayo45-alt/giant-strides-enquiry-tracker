@@ -1,0 +1,71 @@
+{% extends "tracker/staff/base.html" %}
+
+{% block title %}{{ enquiry.child_name }}{% endblock %}
+
+{% block content %}
+<section class="content-card">
+    <h1 class="page-heading">
+        {{ enquiry.child_name }}
+        <span class="status-pill status-{{ enquiry.status }}">{{ enquiry.get_status_display }}</span>
+    </h1>
+    <p class="stage-summary">
+        In stage for {{ days_in_stage }} day{{ days_in_stage|pluralize }}
+    </p>
+
+    <h2 class="staff-section-title">Enquiry details</h2>
+    <dl class="detail-grid">
+        <div class="detail-item"><dt class="detail-label">Parent</dt><dd class="detail-value">{{ enquiry.family.parent_name }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Phone</dt><dd class="detail-value"><a href="tel:{{ enquiry.family.parent_phone }}">{{ enquiry.family.parent_phone }}</a></dd></div>
+        <div class="detail-item"><dt class="detail-label">Email</dt><dd class="detail-value">{% if enquiry.family.parent_email %}<a href="mailto:{{ enquiry.family.parent_email }}">{{ enquiry.family.parent_email }}</a>{% else %}—{% endif %}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Country</dt><dd class="detail-value">{{ enquiry.family.country }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">School year</dt><dd class="detail-value">{{ enquiry.school_year }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Assessment day</dt><dd class="detail-value">{{ enquiry.assessment_day|default:"—" }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Preferred classes</dt><dd class="detail-value">{{ enquiry.proposed_classes|default:"—" }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Assessment date</dt><dd class="detail-value">{{ enquiry.assessment_date|date:"j M Y"|default:"—" }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Assessment time</dt><dd class="detail-value">{{ enquiry.assessment_time|time:"H:i"|default:"—" }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Tutor</dt><dd class="detail-value">{{ enquiry.tutor|default:"—" }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Start date</dt><dd class="detail-value">{{ enquiry.start_date|date:"j M Y"|default:"—" }}</dd></div>
+        <div class="detail-item"><dt class="detail-label">Not proceeding reason</dt><dd class="detail-value">{{ enquiry.not_proceeding_reason|default:"—" }}</dd></div>
+        <div class="detail-item">
+            <dt class="detail-label">Subjects</dt>
+            <dd class="detail-value subject-tags">{% for subject in enquiry.subjects.all %}<span class="subject-tag">{{ subject.name }}</span>{% empty %}—{% endfor %}</dd>
+        </div>
+        <div class="detail-item"><dt class="detail-label">Created</dt><dd class="detail-value">{{ enquiry.created|date:"j M Y, g:i a" }}</dd></div>
+    </dl>
+
+    <section class="staff-section">
+        <h2 class="staff-section-title">Update tracking</h2>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <ul class="error-list">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+            <div class="form-grid">
+                {% for field in form %}
+                    <div class="field{% if field.name == 'notes' %} full{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required" aria-label="required">*</span>{% endif %}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <ul class="error-list">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="form-actions">
+                <button class="button" type="submit">Save changes</button>
+                <a class="button secondary" href="{% url 'staff:staff_list' %}{% if filter_query %}?{{ filter_query }}{% endif %}">Back to list</a>
+            </div>
+        </form>
+        {% include "tracker/staff/stage_actions.html" with stage_post_url=request.path %}
+    </section>
+
+    {% if enquiry.notes %}
+        <section class="staff-section">
+            <h2 class="staff-section-title">Current notes</h2>
+            <div class="siblings-box">{{ enquiry.notes|linebreaksbr }}</div>
+        </section>
+    {% endif %}
+
+</section>
+{% include "tracker/staff/stage_dialog.html" with stage_post_url=request.path stage_enquiry_id=enquiry.pk %}
+{% endblock %}

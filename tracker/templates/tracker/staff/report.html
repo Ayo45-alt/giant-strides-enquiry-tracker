@@ -1,0 +1,53 @@
+{% extends "tracker/staff/base.html" %}
+
+{% block title %}Report{% endblock %}
+
+{% block content %}
+<section class="staff-list-page">
+    <div class="staff-heading-row">
+        <h1 class="staff-list-heading">Enquiry report</h1>
+        <a class="button secondary staff-download-button" href="{% url 'staff:staff_download_everything' %}">Download everything</a>
+    </div>
+    <div class="detail-grid">
+        <section class="content-card">
+            <h2 class="staff-section-title">Received</h2>
+            <p>This month: <strong>{{ this_month.received }}</strong></p>
+            <p>Last month: <strong>{{ last_month.received }}</strong></p>
+        </section>
+        <section class="content-card">
+            <h2 class="staff-section-title">Started</h2>
+            <p>This month: <strong>{{ this_month.started }}</strong></p>
+            <p>Last month: <strong>{{ last_month.started }}</strong></p>
+        </section>
+    </div>
+
+    <section class="staff-table-panel" aria-label="Monthly enquiry report">
+        <div class="report-table-scroll">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Month</th>
+                        <th scope="col">Received</th>
+                        <th scope="col">Assessed</th>
+                        <th scope="col">Started</th>
+                        <th scope="col">Not proceeding</th>
+                        <th scope="col">Received to started</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in months %}
+                        <tr>
+                            <td>{{ row.month|date:"F Y" }}</td>
+                            <td>{{ row.received }}</td>
+                            <td>{{ row.assessed }}</td>
+                            <td>{{ row.started }}</td>
+                            <td>{{ row.not_proceeding }}</td>
+                            <td>{{ row.conversion }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+{% endblock %}
