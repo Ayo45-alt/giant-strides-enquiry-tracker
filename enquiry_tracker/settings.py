@@ -114,7 +114,10 @@ if IS_PRODUCTION and DEBUG:
     ],
 )'''
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "giant-strides-enquiry-tracker1.vercel.app",
+    ".vercel.app",
+]
 
 if IS_PRODUCTION and not ALLOWED_HOSTS:
     raise ValueError(
@@ -122,8 +125,16 @@ if IS_PRODUCTION and not ALLOWED_HOSTS:
     )
 
 
+ALLOWED_HOSTS = [
+    "giant-strides-enquiry-tracker1.vercel.app",
+    ".vercel.app",
+]
+
 CSRF_TRUSTED_ORIGINS = env_list(
-    "DJANGO_CSRF_TRUSTED_ORIGINS"
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    default=[
+        "https://giant-strides-enquiry-tracker1.vercel.app",
+    ],
 )
 
 
@@ -312,12 +323,18 @@ TEMPLATES = [
 }'''
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": os.getenv(
+            "DB_ENGINE",
+            "django.db.backends.postgresql",
+        ),
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT", "5432"),
+        "OPTIONS": {
+            "sslmode": os.getenv("DB_SSLMODE", "require"),
+        },
     }
 }
 
@@ -548,7 +565,11 @@ GOOGLE_CALENDAR_TOKEN_FILE = (
 # ============================================================
 # 18. LOGGING CONFIGURATION
 # ============================================================
-SITE_DOMAIN = "http://127.0.0.1:8000"
+SITE_DOMAIN = os.getenv(
+    "SITE_DOMAIN",
+    "http://127.0.0.1:8000",
+).rstrip("/")
+
 LOGGING = {
     "version": 1,
 
