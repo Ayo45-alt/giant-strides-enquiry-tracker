@@ -106,13 +106,15 @@ if IS_PRODUCTION and DEBUG:
     )
 
 
-ALLOWED_HOSTS = env_list(
+'''ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
     default=[] if IS_PRODUCTION else [
         "127.0.0.1",
         "localhost",
     ],
-)
+)'''
+
+ALLOWED_HOSTS = ["*"]
 
 if IS_PRODUCTION and not ALLOWED_HOSTS:
     raise ValueError(
