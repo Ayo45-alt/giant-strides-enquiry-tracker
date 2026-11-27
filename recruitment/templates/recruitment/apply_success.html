@@ -1,0 +1,693 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Application Received | Giant Strides Online School</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --blue: #0649CE;
+            --blue-dark: #033BAA;
+            --yellow: #FFCC24;
+            --cream: #FFFBE7;
+            --dark: #101828;
+            --text: #596579;
+            --green: #16A34A;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 85% 15%, #FFF1B9, transparent 35%),
+                linear-gradient(135deg, #FFFBE7, #F8F9F5);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        header {
+            background: rgba(255,255,255,0.96);
+            padding: 18px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #EEEEEE;
+        }
+
+        .logo img {
+            width: 105px;
+            height: auto;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--blue);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* MAIN */
+
+        main {
+            max-width: 1150px;
+            margin: auto;
+            padding: 65px 25px;
+        }
+
+        .success-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 0.85fr;
+            gap: 55px;
+            align-items: center;
+        }
+
+        .content {
+            max-width: 590px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: #FFF0A8;
+            color: #A87500;
+            border-radius: 30px;
+            padding: 11px 19px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 26px;
+        }
+
+        .eyebrow span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--yellow);
+        }
+
+        h1 {
+            font-size: clamp(36px, 5vw, 58px);
+            line-height: 1.12;
+            font-weight: 800;
+            letter-spacing: -2.5px;
+            margin-bottom: 22px;
+        }
+
+        h1 span {
+            color: var(--blue);
+        }
+
+        .intro {
+            font-size: 16px;
+            line-height: 1.9;
+            color: var(--text);
+            margin-bottom: 28px;
+        }
+
+        /* SUCCESS REFERENCE */
+
+        .reference {
+            display: inline-block;
+            background: white;
+            padding: 15px 22px;
+            border-radius: 13px;
+            border: 1px solid #E9EAF0;
+            margin-bottom: 30px;
+        }
+
+        .reference small {
+            display: block;
+            color: #8490A3;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .reference strong {
+            color: var(--blue);
+            font-size: 16px;
+        }
+
+        /* PURPOSE CARDS */
+
+        .purpose-list {
+            display: grid;
+            gap: 17px;
+            margin-bottom: 32px;
+        }
+
+        .purpose-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .purpose-icon {
+            flex-shrink: 0;
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            background: #E4EDFF;
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
+
+        .purpose-item h3 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .purpose-item p {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* BUTTON */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 27px;
+            background: var(--blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            transition: 0.25s ease;
+            box-shadow: 0 7px 18px rgba(6,73,206,0.18);
+        }
+
+        .btn:hover {
+            background: var(--blue-dark);
+            transform: translateY(-2px);
+        }
+
+        /* RIGHT STORY PANEL */
+
+        .story-panel {
+            position: relative;
+        }
+
+        .story-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 25px 65px rgba(16,24,40,0.09);
+        }
+
+        .story-visual {
+            min-height: 265px;
+            background:
+                linear-gradient(180deg, rgba(6,73,206,0.05), rgba(6,73,206,0.15)),
+                url("{% static 'tracker/images/tutor-learning.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 25px;
+        }
+
+        .story-label {
+            background: white;
+            color: var(--blue);
+            padding: 10px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .story-content {
+            padding: 30px;
+        }
+
+        .story-content h2 {
+            font-size: 25px;
+            line-height: 1.3;
+            letter-spacing: -0.7px;
+            margin-bottom: 14px;
+        }
+
+        .story-content h2 span {
+            color: var(--blue);
+        }
+
+        .story-content > p {
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .story-highlight {
+            background: var(--cream);
+            border-left: 4px solid var(--yellow);
+            padding: 19px;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .story-highlight p {
+            font-size: 14px;
+            line-height: 1.8;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* RECRUITMENT PROCESS */
+
+        .process-section {
+            margin-top: 80px;
+        }
+
+        .section-heading {
+            text-align: center;
+            margin-bottom: 38px;
+        }
+
+        .section-heading span {
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .section-heading h2 {
+            font-size: 30px;
+            margin-top: 10px;
+            letter-spacing: -1px;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .process-card {
+            background: white;
+            padding: 27px;
+            border-radius: 18px;
+            border: 1px solid #F0F0EA;
+            box-shadow: 0 8px 25px rgba(16,24,40,0.035);
+        }
+
+        .process-number {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #E7EFFF;
+            color: var(--blue);
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .process-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .process-card p {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* CLOSING MESSAGE */
+
+        .closing {
+            margin-top: 55px;
+            background: var(--blue);
+            border-radius: 20px;
+            padding: 38px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .closing h2 {
+            font-size: 25px;
+            margin-bottom: 12px;
+        }
+
+        .closing p {
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 650px;
+            margin: auto;
+            color: #E4ECFF;
+        }
+
+        footer {
+            text-align: center;
+            padding: 28px 15px;
+            color: #8490A3;
+            font-size: 12px;
+        }
+
+        footer strong {
+            color: var(--blue);
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 850px) {
+            .success-wrapper {
+                grid-template-columns: 1fr;
+                gap: 45px;
+            }
+
+            .content {
+                max-width: 100%;
+            }
+
+            .story-panel {
+                max-width: 600px;
+                width: 100%;
+                margin: auto;
+            }
+
+            .process-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-section {
+                margin-top: 60px;
+            }
+        }
+
+        @media(max-width: 550px) {
+            header {
+                padding: 16px 5%;
+            }
+
+            .logo img {
+                width: 85px;
+            }
+
+            main {
+                padding: 45px 19px;
+            }
+
+            h1 {
+                font-size: 39px;
+                letter-spacing: -1.7px;
+            }
+
+            .intro {
+                font-size: 14px;
+            }
+
+            .story-content {
+                padding: 23px;
+            }
+
+            .story-visual {
+                min-height: 210px;
+            }
+
+            .closing {
+                padding: 30px 20px;
+            }
+
+            .closing h2 {
+                font-size: 21px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a href="/" class="logo">
+        <img src="{% static 'tracker/logo.png' %}"
+             alt="Giant Strides Online School">
+    </a>
+
+    <a href="/" class="home-link">
+        Return to Homepage →
+    </a>
+</header>
+
+<main>
+
+    <!-- APPLICATION SUCCESS HERO -->
+
+    <section class="success-wrapper">
+
+        <div class="content">
+
+            <div class="eyebrow">
+                <span></span>
+                APPLICATION SUCCESSFULLY RECEIVED
+            </div>
+
+            <h1>
+                Every Child Deserves a
+                <span>Chance to Shine.</span>
+            </h1>
+
+            <p class="intro">
+
+                {% if tutor_name %}
+                    Hello {{ tutor_name }},
+                {% else %}
+                    Hello Future Educator,
+                {% endif %}
+
+                thank you for taking the first step towards
+                joining Giant Strides Online School.
+
+                We believe every child has unique abilities,
+                untapped potential and a different way of learning.
+
+                Sometimes, all a child needs is the right teacher,
+                someone patient enough to understand them,
+                committed enough to guide them, and passionate
+                enough to help them discover what they can achieve.
+
+                Your application brings us one step closer
+                to making that connection.
+
+            </p>
+
+            {% if application_reference %}
+            <div class="reference">
+                <small>YOUR APPLICATION REFERENCE</small>
+                <strong>{{ application_reference }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="purpose-list">
+
+                <div class="purpose-item">
+                    <div class="purpose-icon">📚</div>
+                    <div>
+                        <h3>Understanding Every Learner</h3>
+                        <p>
+                            We want to understand each child's
+                            current learning level, strengths
+                            and areas where they need support.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="purpose-item">
+                    <div class="purpose-icon">🎯</div>
+                    <div>
+                        <h3>Creating Meaningful Progress</h3>
+                        <p>
+                            Through personalised teaching,
+                            we help learners build confidence,
+                            improve their skills and achieve
+                            their academic goals.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="purpose-item">
+                    <div class="purpose-icon">🌟</div>
+                    <div>
+                        <h3>Making Every Lesson Count</h3>
+                        <p>
+                            We value educators who see teaching
+                            as more than delivering lessons:
+                            it is about making a lasting difference.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <a href="/" class="btn">
+                Return to Homepage →
+            </a>
+
+        </div>
+
+        <!-- BRAND STORY PANEL -->
+
+        <div class="story-panel">
+
+            <div class="story-card">
+
+                <div class="story-visual">
+                    <span class="story-label">
+                        Every Learner Matters
+                    </span>
+                </div>
+
+                <div class="story-content">
+
+                    <h2>
+                        Behind Every Lesson Is
+                        <span>A Child's Future.</span>
+                    </h2>
+
+                    <p>
+                        Imagine a child who struggles with a
+                        particular subject, a learner who has
+                        lost confidence, or someone who simply
+                        needs a different approach to understand
+                        a difficult concept.
+
+                        At Giant Strides, we believe that the
+                        right educational support can change
+                        that experience.
+                    </p>
+
+                    <div class="story-highlight">
+                        <p>
+                            "We don't just want children to
+                            complete lessons. We want them to
+                            understand, grow in confidence and
+                            discover what they are capable of."
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- WHAT HAPPENS NEXT -->
+
+    <section class="process-section">
+
+        <div class="section-heading">
+            <span>THE JOURNEY AHEAD</span>
+            <h2>What Happens After Your Application?</h2>
+        </div>
+
+        <div class="process-grid">
+
+            <div class="process-card">
+                <div class="process-number">01</div>
+
+                <h3>Application Review</h3>
+
+                <p>
+                    Our recruitment team will carefully review
+                    your application, qualifications,
+                    teaching experience and submitted details.
+                </p>
+            </div>
+
+            <div class="process-card">
+                <div class="process-number">02</div>
+
+                <h3>Teaching Assessment</h3>
+
+                <p>
+                    If shortlisted, you may be contacted
+                    regarding a teaching assessment.
+                    This helps us understand your subject
+                    knowledge and teaching approach.
+                </p>
+            </div>
+
+            <div class="process-card">
+                <div class="process-number">03</div>
+
+                <h3>Recruitment Update</h3>
+
+                <p>
+                    Our team will communicate the outcome
+                    and any further instructions using
+                    the contact details you provided.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FINAL MESSAGE -->
+
+    <section class="closing">
+
+        <h2>
+            Together, We Can Help Every Child Go Further.
+        </h2>
+
+        <p>
+            Thank you for considering Giant Strides as a place
+            to share your knowledge, passion and teaching
+            experience.
+
+            We look forward to the possibility of having you
+            as part of a community dedicated to helping
+            learners unlock their full potential.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer>
+    © {% now "Y" %}
+    <strong>Giant Strides Online School.</strong>
+    All Rights Reserved.
+
+    <br><br>
+
+    Empowering Learners. Inspiring Excellence.
+</footer>
+
+</body>
+</html>

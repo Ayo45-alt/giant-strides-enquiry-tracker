@@ -1,0 +1,540 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Link Expired | Giant Strides Online School</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --blue: #0649CE;
+            --blue-dark: #033BAA;
+            --yellow: #FFCC24;
+            --cream: #FFFBE7;
+            --dark: #101828;
+            --text: #596579;
+            --orange: #D97706;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 85% 10%, #FFF1B9, transparent 35%),
+                linear-gradient(135deg, #FFFBE7, #F8F9F5);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+
+        header {
+            background: rgba(255,255,255,.96);
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo img {
+            width: 105px;
+            height: auto;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* MAIN */
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 22px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            text-align: center;
+        }
+
+        /* EXPIRED ICON */
+
+        .status-icon {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background: #FFF0CC;
+            border: 7px solid #FFFAE9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 27px;
+            font-size: 39px;
+            color: var(--orange);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: #FFF0A8;
+            color: #A87500;
+            padding: 11px 19px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .4px;
+            margin-bottom: 25px;
+        }
+
+        .eyebrow span {
+            width: 8px;
+            height: 8px;
+            background: var(--yellow);
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-size: clamp(35px, 5vw, 53px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        h1 span {
+            color: var(--blue);
+        }
+
+        .intro {
+            max-width: 650px;
+            margin: 0 auto 35px;
+            font-size: 15px;
+            line-height: 1.9;
+            color: var(--text);
+        }
+
+        /* MESSAGE CARD */
+
+        .message-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: left;
+            box-shadow: 0 12px 40px rgba(16,24,40,.055);
+            border: 1px solid #F0F0EA;
+            margin-bottom: 28px;
+        }
+
+        .message-card h2 {
+            font-size: 19px;
+            margin-bottom: 13px;
+        }
+
+        .message-card > p {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.9;
+        }
+
+        /* NEXT STEPS */
+
+        .next-steps {
+            margin-top: 27px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .step-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: #E8F0FF;
+            color: var(--blue);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .step h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .step p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--text);
+        }
+
+        /* REASSURANCE */
+
+        .reassurance {
+            background: #FFFBE7;
+            border-left: 4px solid var(--yellow);
+            border-radius: 0 12px 12px 0;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .reassurance p {
+            color: var(--dark);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* BUTTONS */
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 13px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 26px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: .2s ease;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: white;
+            box-shadow: 0 6px 17px rgba(6,73,206,.18);
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #DDE2EA;
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        /* CLOSING */
+
+        .closing {
+            margin-top: 45px;
+        }
+
+        .closing h2 {
+            font-size: 21px;
+            margin-bottom: 10px;
+        }
+
+        .closing h2 span {
+            color: var(--blue);
+        }
+
+        .closing p {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+            padding: 25px 15px;
+            color: #8490A3;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        footer strong {
+            color: var(--blue);
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 550px) {
+            header {
+                padding: 16px 5%;
+            }
+
+            .logo img {
+                width: 85px;
+            }
+
+            main {
+                padding: 45px 18px;
+            }
+
+            h1 {
+                font-size: 38px;
+                letter-spacing: -1.5px;
+            }
+
+            .intro {
+                font-size: 14px;
+            }
+
+            .message-card {
+                padding: 23px 19px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a href="/" class="logo">
+        <img src="{% static 'tracker/logo.png' %}"
+             alt="Giant Strides Online School">
+    </a>
+
+    <a href="/" class="home-link">
+        Return Home →
+    </a>
+</header>
+
+
+<main>
+
+    <section class="container">
+
+        <div class="status-icon">
+            ⏳
+        </div>
+
+        <div class="eyebrow">
+            <span></span>
+            LINK VALIDITY PERIOD ENDED
+        </div>
+
+        <h1>
+            Looks Like This Link
+            <span>Has Expired.</span>
+        </h1>
+
+        <p class="intro">
+
+            Hello{% if tutor_name %} {{ tutor_name }}{% else %} Educator{% endif %},
+
+            it looks like the link you are trying to access
+            is no longer valid because its permitted access
+            period has ended.
+
+            We understand that schedules can get busy and
+            sometimes things don't happen exactly as planned.
+
+            Don't worry. We'd be happy to help you understand
+            the next steps and get the assistance you need.
+
+        </p>
+
+
+        <!-- EXPLANATION CARD -->
+
+        <div class="message-card">
+
+            <h2>What does this mean?</h2>
+
+            <p>
+                For security and proper recruitment management,
+                our application and assessment links are
+                time-limited.
+
+                Once the validity period ends, the link can no
+                longer be used to access its associated form.
+
+                This does not automatically mean that your
+                application has been rejected or that your
+                opportunity with Giant Strides has ended.
+            </p>
+
+
+            <div class="next-steps">
+
+                <div class="step">
+
+                    <div class="step-icon">📩</div>
+
+                    <div>
+                        <h3>Contact Our Team</h3>
+                        <p>
+                            Reach out to our recruitment or
+                            academic coordination team and
+                            explain which link you were trying
+                            to access.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-icon">🔄</div>
+
+                    <div>
+                        <h3>Request a New Link</h3>
+                        <p>
+                            Our team can review your request
+                            and advise whether a fresh link
+                            can be issued.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-icon">🌟</div>
+
+                    <div>
+                        <h3>Continue Your Journey</h3>
+                        <p>
+                            If you are still interested in
+                            joining our tutor community,
+                            we'd be glad to guide you through
+                            the next steps.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REASSURANCE -->
+
+        <div class="reassurance">
+
+            <p>
+                <strong>A little reminder:</strong>
+
+                At Giant Strides, we believe every child
+                deserves the opportunity to learn, grow
+                and discover their potential.
+
+                We also understand that great educators
+                sometimes need a little assistance along
+                the way. Don't hesitate to reach out.
+            </p>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="actions">
+
+            {% if support_email %}
+                <a href="mailto:{{ support_email }}"
+                   class="btn btn-primary">
+                    Contact Support →
+                </a>
+            {% else %}
+                <a href="/"
+                   class="btn btn-primary">
+                    Return to Homepage →
+                </a>
+            {% endif %}
+
+            <a href="/"
+               class="btn btn-secondary">
+                Back to Homepage
+            </a>
+
+        </div>
+
+
+        <!-- CLOSING -->
+
+        <div class="closing">
+
+            <h2>
+                Your Journey Matters
+                <span>to Us.</span>
+            </h2>
+
+            <p>
+                Thank you for your interest in Giant Strides
+                Online School.
+
+                We remain committed to connecting dedicated
+                educators with learners who need the right
+                guidance, encouragement and support.
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    © {% now "Y" %}
+    <strong>Giant Strides Online School.</strong>
+    All Rights Reserved.
+
+    <br>
+
+    Empowering Learners. Inspiring Excellence.
+
+</footer>
+
+</body>
+</html>

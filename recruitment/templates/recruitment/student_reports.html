@@ -1,0 +1,48 @@
+<!-- templates/recruitment/student_reports.html -->
+{% extends "recruitment/base_recruitment.html" %}
+{% block title %}Student Assessment Reports{% endblock %}
+
+{% block recruitment_content %}
+<div class="gs-header">
+  <div>
+    <h1>📄 Student Assessment Reports</h1>
+    <div class="gs-subtitle">Compiled multi-subject tutor reports ready to export onto Giant Strides official letterhead (.docx) or email directly to parents.</div>
+  </div>
+</div>
+
+{% for ad in ads %}
+<div class="gs-card">
+  <div class="gs-card-header">
+    <div>
+      <strong style="font-size:1.05rem;">{{ ad.enquiry.child_name }}</strong>
+      <span style="color:#64748b; margin-left:0.5rem;">Ref: {{ ad.ref_code }} • Parent: {{ ad.enquiry.family.parent_name }} ({{ ad.enquiry.family.parent_email|default:"No email" }})</span>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <a href="{% url 'recruitment:student_full_detail' ad.enquiry.id %}" class="gs-btn gs-btn-outline">👁️ Full Journey</a>
+      <a href="{% url 'recruitment:download_report_docx' ad.enquiry.id %}" class="gs-btn gs-btn-primary">⬇️ Download Letterhead (.DOCX)</a>
+      <a href="{% url 'recruitment:email_report_docx' ad.enquiry.id %}" class="gs-btn gs-btn-success" onclick="return confirm('Send compiled Word report to {{ ad.enquiry.family.parent_email }}?')">✉️ Email to Parent</a>
+    </div>
+  </div>
+
+  <div class="gs-card-body">
+    {% for app in ad.applications.all %}
+      {% if app.is_approved %}
+      <div style="border-left: 3px solid #1e3a8a; padding-left: 1rem; margin-bottom: 1.25rem;">
+        <h4 style="margin:0 0 0.4rem 0; color:#1e3a8a;">{{ app.subject.name }} — Assessed by {{ app.full_name }}</h4>
+        {% if app.report %}
+          <p style="margin:0.25rem 0; font-size:0.88rem;"><strong>Current Level:</strong> {{ app.report.current_level }}</p>
+          <p style="margin:0.25rem 0; font-size:0.88rem;"><strong>Strengths:</strong> {{ app.report.academic_strengths }}</p>
+          <p style="margin:0.25rem 0; font-size:0.88rem;"><strong>Areas for Improvement:</strong> {{ app.report.areas_for_improvement }}</p>
+          <p style="margin:0.25rem 0; font-size:0.88rem;"><strong>Recommendations:</strong> {{ app.report.recommendations }}</p>
+        {% else %}
+          <span class="gs-tag gs-tag-open">⏳ Awaiting Tutor Report Submission</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% empty %}
+<div class="gs-card"><div class="gs-card-body" style="text-align:center; color:#64748b;">No tutor assessment reports have been submitted yet.</div></div>
+{% endfor %}
+{% endblock %}

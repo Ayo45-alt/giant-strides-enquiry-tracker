@@ -1,0 +1,14 @@
+
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+    {% if original and original.pk %}
+        <li>
+            <a href="{% url 'admin:tracker_enquiry_generate_meet' original.pk %}">
+                Generate Google Meet
+            </a>
+        </li>
+    {% endif %}
+
+    {{ block.super }}
+{% endblock %}

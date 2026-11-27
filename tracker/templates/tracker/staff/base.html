@@ -1,224 +1,1515 @@
+
 {% extends "tracker/base.html" %}
 {% load static %}
 
 {% block body_class %}staff-page{% endblock %}
 
 {% block extra_styles %}
-    .staff-page { background: #f7f9fc; font-size: 14px; }
-    .staff-page .site-header { display: none; }
-    .staff-layout { min-height: 100vh; display: flex; }
+
+/* ==========================================
+   GIANT STRIDES STAFF PORTAL
+   Modern Administrative Interface
+========================================== */
+
+:root {
+    --gs-primary: #1740c8;
+    --gs-primary-dark: #12349f;
+    --gs-navy: #142d55;
+    --gs-bg: #f5f7fb;
+    --gs-white: #ffffff;
+    --gs-border: #e5eaf1;
+    --gs-text: #182232;
+    --gs-muted: #758196;
+    --gs-radius: 12px;
+    --gs-shadow: 0 3px 14px rgba(25,45,80,.045);
+}
+
+.staff-page {
+    background: var(--gs-bg);
+    color: var(--gs-text);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.staff-page .site-header {
+    display: none;
+}
+
+.staff-layout {
+    min-height: 100vh;
+    display: flex;
+}
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.staff-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 20;
+    width: 245px;
+    padding: 25px 15px 18px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-right: 1px solid var(--gs-border);
+    box-shadow: 2px 0 12px rgba(20,45,85,.025);
+    overflow-y: auto;
+}
+
+.staff-sidebar-brand {
+    display: block;
+    margin: 0 10px 30px;
+    padding: 0 5px;
+}
+
+.staff-sidebar-brand img {
+    display: block;
+    width: 100%;
+    max-height: 72px;
+    object-fit: contain;
+    object-position: left center;
+}
+
+.staff-sidebar-nav {
+    display: grid;
+    gap: 5px;
+}
+
+.staff-sidebar-section-label {
+    margin: 17px 10px 8px;
+    color: #929caf;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .11em;
+}
+
+.staff-sidebar-link {
+    min-height: 43px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: #647187;
+    border-radius: 9px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 550;
+    transition: background .18s ease, color .18s ease;
+}
+
+.staff-sidebar-link:hover {
+    color: var(--gs-primary);
+    background: #f2f5ff;
+}
+
+.staff-sidebar-link.active {
+    color: var(--gs-primary);
+    background: #eaf0ff;
+    font-weight: 700;
+}
+
+.staff-sidebar-link svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+}
+
+.staff-nav-icon {
+    width: 20px;
+    flex: 0 0 20px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.staff-sidebar-count {
+    min-width: 22px;
+    height: 22px;
+    margin-left: auto;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #657187;
+    background: #f0f3f7;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.staff-sidebar-link.active .staff-sidebar-count {
+    color: var(--gs-primary);
+    background: #d8e3ff;
+}
+
+.staff-sidebar-link.followup-link {
+    color: #946200;
+}
+
+.staff-sidebar-link.followup-link:hover {
+    background: #fff8e6;
+}
+
+.staff-sidebar-link.followup-link.active {
+    color: #805500;
+    background: #fff2cf;
+}
+
+.staff-amber-dot {
+    width: 7px;
+    height: 7px;
+    margin: 0 2px 0 4px;
+    flex: 0 0 7px;
+    background: #efa900;
+    border-radius: 50%;
+}
+
+.staff-sidebar-divider {
+    height: 1px;
+    margin: 15px 8px;
+    background: var(--gs-border);
+}
+
+.staff-sidebar-bottom {
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.staff-sidebar-bottom form {
+    margin: 0;
+}
+
+.staff-sidebar-bottom button {
+    width: 100%;
+    background: none;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.staff-sidebar-bottom button:hover {
+    color: #c43e3e;
+    background: #fff1f1;
+}
+
+/* ==========================================
+   MAIN WORKSPACE
+========================================== */
+
+.staff-main {
+    width: calc(100% - 245px);
+    min-height: 100vh;
+    margin-left: 245px;
+    padding: 36px clamp(24px, 4vw, 64px) 60px;
+    background: var(--gs-bg);
+}
+
+.staff-page main.staff-main {
+    width: calc(100% - 245px);
+    margin: 0 0 0 245px;
+}
+
+.staff-main-inner {
+    width: min(100%, 1500px);
+    margin: 0 auto;
+}
+
+.staff-page .messages {
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.staff-page .message {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    color: #245d3d;
+    background: #eaf8ef;
+    border: 1px solid #ccebd5;
+    border-radius: 9px;
+}
+
+/* ==========================================
+   PAGE HEADINGS
+========================================== */
+
+.staff-heading-row {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.staff-list-heading {
+    margin: 0;
+    color: var(--gs-text);
+    font-size: 25px;
+    font-weight: 750;
+    letter-spacing: -.7px;
+}
+
+.staff-heading-count {
+    padding: 4px 9px;
+    color: #68758b;
+    background: #edf1f6;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.staff-heading-tools {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ==========================================
+   FILTERS AND SEARCH
+========================================== */
+
+.staff-filters {
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.staff-filters .field {
+    flex: 0 0 auto;
+}
+
+.staff-filter-search {
+    width: min(300px, 32vw);
+}
+
+.staff-filter-subject {
+    width: 170px;
+}
+
+.staff-filters .form-input {
+    min-height: 42px;
+    height: 42px;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid var(--gs-border);
+    border-radius: 9px;
+    font-size: 13px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.staff-filters .form-input:focus {
+    outline: none;
+    border-color: var(--gs-primary);
+    box-shadow: 0 0 0 3px rgba(23,64,200,.09);
+}
+
+.staff-filters .field label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+}
+
+.staff-download-button {
+    min-height: 42px;
+    height: 42px;
+    padding: 8px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.staff-table-panel {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--gs-border);
+    border-radius: 13px;
+    box-shadow: var(--gs-shadow);
+}
+
+.staff-table {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.staff-table th {
+    padding: 15px 14px;
+    color: #78859a;
+    background: #f8faff;
+    border-bottom: 1px solid var(--gs-border);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.staff-table td {
+    padding: 15px 14px;
+    border-bottom: 1px solid #edf0f5;
+    vertical-align: middle;
+}
+
+.staff-table tbody tr {
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.staff-table tbody tr:hover {
+    background: #f8faff;
+}
+
+.staff-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.staff-table tbody tr.due-row,
+.staff-table tbody tr.due-row:hover {
+    background: #fff;
+}
+
+.staff-table tbody tr.due-row td:first-child {
+    border-left: 0;
+}
+
+.staff-table td:nth-child(2) {
+    min-width: 205px;
+}
+
+/* ==========================================
+   STUDENT AND PARENT INFORMATION
+========================================== */
+
+.staff-child-cell {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 7px;
+}
+
+.staff-child-name {
+    color: #202c40;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.staff-table a.staff-child-name {
+    color: #182232;
+}
+
+.staff-sibling-line,
+.staff-school-year {
+    flex-basis: 100%;
+    display: block;
+    color: #7a8492;
+    font-size: 12px;
+}
+
+.staff-sibling-line a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.staff-school-year {
+    margin-top: -3px;
+}
+
+.staff-muted {
+    color: #9099a6;
+}
+
+.staff-child-subjects {
+    flex-basis: 100%;
+}
+
+.staff-parent-name {
+    display: block;
+    color: #344154;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.staff-parent-phone {
+    display: block;
+    color: #7a8492;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* ==========================================
+   DATES AND FOLLOW-UP
+========================================== */
+
+.staff-date-cell {
+    white-space: nowrap;
+}
+
+.staff-date-overdue {
+    color: #c43e3e;
+    font-weight: 650;
+}
+
+.staff-date-muted {
+    color: #9099a6;
+}
+
+.staff-waiting {
+    white-space: nowrap;
+}
+
+.staff-waiting-dot {
+    width: 7px;
+    height: 7px;
+    margin-right: 6px;
+    display: inline-block;
+    vertical-align: middle;
+    background: #e9a321;
+    border-radius: 50%;
+}
+
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.staff-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.staff-row-actions .button {
+    min-height: 33px;
+    padding: 7px 11px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.ref-chip {
+    margin: 4px 0 0;
+    padding: 3px 9px;
+    color: #1a3de8;
+    background: #eef2ff;
+    border: 1px solid #c9d3ff;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ref-chip:hover {
+    background: #e0e7ff;
+}
+
+.ref-chip[hidden] {
+    display: none;
+}
+
+/* ==========================================
+   EDIT DIALOG
+========================================== */
+
+.clean-edit-dialog {
+    border: 1px solid var(--gs-border);
+    border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(15,23,42,.2);
+    padding: 24px 28px;
+    width: min(640px, 94vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.clean-edit-dialog::backdrop {
+    background: rgba(15,23,42,.45);
+    backdrop-filter: blur(3px);
+}
+
+.clean-edit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e7ebf0;
+}
+
+.clean-edit-header h2 {
+    margin: 0;
+    color: var(--gs-navy);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -.3px;
+}
+
+.clean-edit-close {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #566273;
+    background: #f1f4f7;
+    border: 0;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.clean-edit-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.clean-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 14px;
+    margin-top: 14px;
+}
+
+.clean-edit-full {
+    grid-column: span 2;
+}
+
+.clean-edit-section-title {
+    grid-column: span 2;
+    margin: 10px 0 2px;
+    padding-top: 10px;
+    color: #64748b;
+    border-top: 1px solid #f1f5f9;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.clean-edit-dialog label {
+    display: block;
+    margin-bottom: 5px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.clean-edit-dialog .form-input {
+    width: 100%;
+    height: 39px;
+    min-height: 39px;
+    box-sizing: border-box;
+    border: 1px solid #dfe5ed;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.clean-edit-dialog .form-input:focus {
+    outline: none;
+    border-color: var(--gs-primary);
+    box-shadow: 0 0 0 3px rgba(23,64,200,.08);
+}
+
+.clean-edit-dialog textarea.form-input {
+    height: auto;
+    min-height: 72px;
+}
+
+.clean-edit-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e7ebf0;
+}
+
+.clean-edit-footer .button {
+    min-height: 38px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+/* ==========================================
+   TOAST NOTIFICATIONS
+========================================== */
+
+.staff-toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 70;
+    padding: 12px 18px;
+    color: #fff;
+    background: #1d5e3a;
+    border-radius: 9px;
+    box-shadow: 0 8px 24px #172a3d33;
+}
+
+/* ==========================================
+   PAGINATION
+========================================== */
+
+.staff-page .pagination {
+    margin-top: 20px;
+    gap: 6px;
+}
+
+.staff-page .pagination a {
+    padding: 8px 13px;
+    color: #46546b;
+    background: #fff;
+    border: 1px solid #dfe5ec;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: .15s ease;
+}
+
+.staff-page .pagination a:hover {
+    color: var(--gs-primary);
+    background: #edf2ff;
+    border-color: #cbd8ff;
+}
+
+/* ==========================================
+   MOBILE COMPONENTS
+========================================== */
+
+.staff-bottom-nav {
+    display: none;
+}
+
+.staff-mobile-more {
+    position: relative;
+}
+
+.staff-mobile-more-panel {
+    position: absolute;
+    right: 0;
+    bottom: 54px;
+    z-index: 40;
+    min-width: 215px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid var(--gs-border);
+    border-radius: 12px;
+    box-shadow: 0 9px 28px #172a3d24;
+}
+
+.staff-mobile-more-panel a,
+.staff-mobile-more-panel button {
+    width: 100%;
+    padding: 11px 10px;
+    display: block;
+    color: #344154;
+    background: transparent;
+    border: 0;
+    border-radius: 7px;
+    text-align: left;
+    text-decoration: none;
+    font: inherit;
+    font-size: 12px;
+}
+
+.staff-mobile-more-panel a:hover,
+.staff-mobile-more-panel button:hover {
+    color: var(--gs-primary);
+    background: #f2f5ff;
+}
+
+.staff-mobile-more-panel form {
+    margin: 0;
+}
+
+.staff-mobile-more-panel[hidden] {
+    display: none;
+}
+
+.staff-mobile-more summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.staff-mobile-more summary::-webkit-details-marker {
+    display: none;
+}
+
+.staff-sheet-sub {
+    display: block;
+    color: #7a8492;
+    font-size: 11px;
+}
+
+.staff-card-date {
+    color: #667387;
+    font-size: 12px;
+}
+
+.staff-card-date strong {
+    color: #344154;
+    font-weight: 600;
+}
+
+.staff-card-subjects {
+    margin-top: 8px;
+}
+
+.staff-card-actions {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==========================================
+   RESPONSIVE TABLET
+========================================== */
+
+@media (min-width: 768px) and (max-width: 1100px) {
+
     .staff-sidebar {
-        position: fixed; inset: 0 auto 0 0; z-index: 20; width: 220px;
-        padding: 22px 14px 16px; display: flex; flex-direction: column;
-        background: #eef3f8; border-right: 1px solid #dfe6ee;
+        width: 215px;
     }
-    .staff-sidebar-brand { margin: 0 8px 26px; display: block; }
-    .staff-sidebar-brand img { display: block; width: 100%; max-height: 82px; object-fit: contain; object-position: left center; }
-    .staff-sidebar-nav { display: grid; gap: 4px; }
-    .staff-sidebar-link {
-        min-height: 42px; padding: 9px 10px; display: flex; align-items: center; gap: 11px;
-        color: #536174; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500;
+
+    .staff-page main.staff-main {
+        width: calc(100% - 215px);
+        margin-left: 215px;
+        padding: 28px 22px 50px;
     }
-    .staff-sidebar-link:hover { color: #1740c8; background: #e4ebf5; }
-    .staff-sidebar-link.active { color: #1740c8; background: #dfe9ff; font-weight: 600; }
-    .staff-sidebar-link svg { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-    .staff-sidebar-count { min-width: 21px; height: 21px; margin-left: auto; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; color: #596779; background: #e3e9f0; border-radius: 999px; font-size: 11px; }
-    .staff-sidebar-link.active .staff-sidebar-count { color: #1740c8; background: #d0ddff; }
-    .staff-sidebar-link.followup-link { color: #8a5a00; }
-    .staff-sidebar-link.followup-link.active { color: #805500; background: #fff0c7; }
-    .staff-amber-dot { width: 7px; height: 7px; margin: 0 2px 0 4px; flex: 0 0 7px; background: #efa900; border-radius: 50%; }
-    .staff-sidebar-divider { height: 1px; margin: 12px 8px; background: #d7e0e9; }
-    .staff-sidebar-bottom { margin-top: auto; }
-    .staff-sidebar-bottom form { margin: 0; }
-    .staff-sidebar-bottom button { width: 100%; background: none; border: 0; text-align: left; cursor: pointer; font: inherit; }
-    .staff-main { width: calc(100% - 220px); min-height: 100vh; margin-left: 220px; padding: 34px clamp(22px, 4vw, 58px) 56px; }
-    .staff-main-inner { width: min(100%, 1500px); margin: 0 auto; }
-    .staff-page main.staff-main { width: calc(100% - 220px); margin: 0 0 0 220px; }
-    .staff-page .messages { margin: 0 0 18px; }
-    .staff-heading-row { margin-bottom: 20px; display: flex; align-items: baseline; gap: 10px; }
-    .staff-list-heading { margin: 0; font-size: 1.5rem; font-weight: 600; }
-    .staff-heading-count { color: #647184; font-size: 13px; }
-    .staff-heading-tools { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-    .staff-filter-search { width: min(300px, 32vw); }
-    .staff-filter-subject { width: 170px; }
-    .staff-filters { margin: 0 0 16px; display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
-    .staff-filters .field { flex: 0 0 auto; }
-    .staff-filters .form-input { min-height: 40px; height: 40px; padding: 8px 11px; border-radius: 8px; font-size: 13px; }
-    .staff-filters .field label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-    .staff-download-button { min-height: 40px; height: 40px; padding: 8px 12px; font-size: 13px; white-space: nowrap; }
-    .staff-table-panel { border: 1px solid #e0e6ed; border-radius: 12px; }
-    .staff-table { font-size: 14px; }
-    .staff-table th { background: #fff; font-size: 12px; letter-spacing: .04em; }
-    .staff-table th, .staff-table td { padding: 13px 12px; }
-    .staff-table tbody tr { cursor: pointer; }
-    .staff-table tbody tr.due-row, .staff-table tbody tr.due-row:hover { background: #fff; }
-    .staff-table tbody tr.due-row td:first-child { border-left: 0; }
-    .staff-child-cell { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 7px; }
-    .staff-child-name { font-weight: 700; }
-    .staff-sibling-line, .staff-school-year { flex-basis: 100%; display: block; color: #7a8492; font-size: 12px; }
-    .staff-sibling-line a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
-    .staff-school-year { margin-top: -3px; }
-    .staff-muted { color: #9099a6; }
-    .staff-child-subjects { flex-basis: 100%; }
-    .staff-table a.staff-child-name { color: #182232; }
-    .staff-parent-name { display: block; font-weight: 600; }
-    .staff-parent-phone { display: block; color: #7a8492; font-size: 12px; white-space: nowrap; }
-    .staff-table td:nth-child(2) { min-width: 205px; }
-    .staff-date-cell { white-space: nowrap; }
-    .staff-date-overdue { color: #bd3030; }
-    .staff-date-muted { color: #9099a6; }
-    .staff-waiting { white-space: nowrap; }
-    .staff-waiting-dot { width: 7px; height: 7px; margin-right: 6px; display: inline-block; vertical-align: middle; background: #efa900; border-radius: 50%; }
-    .staff-row-actions { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .staff-row-actions .button { min-height: 32px; padding: 5px 9px; font-size: 12px; }
-    .staff-toast { position: fixed; right: 24px; bottom: 24px; z-index: 70; padding: 11px 16px; color: #fff; background: #1d5e3a; border-radius: 8px; box-shadow: 0 8px 24px #172a3d33; }
-    .ref-chip { margin: 4px 0 0; padding: 2px 9px; color: #1a3de8; background: #eef2ff; border: 1.5px solid #c9d3ff; border-radius: 999px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .ref-chip:hover { background: #e0e7ff; }
-    .ref-chip[hidden] { display: none; }
+
+    .staff-list-heading {
+        font-size: 22px;
+    }
+
+    .staff-table th,
+    .staff-table td {
+        padding: 12px 9px;
+    }
+
+    .staff-table {
+        font-size: 12px;
+    }
+}
+
+/* ==========================================
+   RESPONSIVE MOBILE
+========================================== */
+
+@media (max-width: 767px) {
+
+    .staff-sidebar {
+        display: none;
+    }
+
+    .staff-page main.staff-main {
+        width: 100%;
+        margin: 0;
+        padding: 25px 15px 100px;
+    }
+
+    .staff-heading-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 5px 8px;
+    }
+
+    .staff-list-heading {
+        font-size: 22px;
+    }
+
+    .staff-heading-tools {
+        width: 100%;
+        margin: 12px 0 0;
+    }
+
+    .staff-filters {
+        width: 100%;
+        margin-bottom: 14px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .staff-filter-search {
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+
+    .staff-filter-subject {
+        width: 100%;
+    }
+
+    .staff-filters .field {
+        width: 100%;
+        flex: auto;
+    }
+
+    .staff-filters .form-input {
+        width: 100%;
+    }
+
+    .staff-table-wrap {
+        display: none;
+    }
+
+    .mobile-enquiry-list {
+        display: grid;
+        gap: 10px;
+    }
+
+    .staff-table-panel {
+        overflow: visible;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .staff-list-page .staff-table-panel
+    .mobile-enquiry-card {
+        margin: 0;
+        padding: 16px;
+        background: #fff;
+        border: 1px solid var(--gs-border);
+        border-radius: 12px;
+        box-shadow: var(--gs-shadow);
+    }
+
+    .staff-list-page .staff-table-panel
+    .mobile-enquiry-card.due-row {
+        border-left: 1px solid var(--gs-border);
+        background: #fff;
+    }
+
+    .staff-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .staff-card-top .mobile-enquiry-name {
+        color: #182232;
+        font-weight: 700;
+    }
+
+    .staff-card-actions {
+        flex-wrap: wrap;
+    }
+
+    /* Mobile bottom navigation */
+
+    .staff-bottom-nav {
+        position: fixed;
+        inset: auto 0 0;
+        z-index: 30;
+        height: 68px;
+        padding: 5px 7px max(5px, env(safe-area-inset-bottom));
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        background: rgba(255,255,255,.97);
+        border-top: 1px solid var(--gs-border);
+        box-shadow: 0 -5px 20px rgba(20,45,85,.05);
+        backdrop-filter: blur(12px);
+    }
+
+    .staff-bottom-nav > a,
+    .staff-bottom-nav > button,
+    .staff-bottom-nav summary {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        color: #627083;
+        background: transparent;
+        border: 0;
+        text-decoration: none;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .staff-bottom-nav svg {
+        width: 19px;
+        height: 19px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+    }
+
+    .staff-bottom-nav .active {
+        color: var(--gs-primary);
+    }
+
+    .staff-mobile-more {
+        list-style: none;
+    }
+
+    .staff-mobile-more summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .staff-mobile-more-panel {
+        right: 0;
+        bottom: 58px;
+    }
+
+    .staff-toast {
+        right: 12px;
+        bottom: 78px;
+        left: 12px;
+        text-align: center;
+    }
+
+    /* Modal */
+
     .clean-edit-dialog {
-        border: 0; border-radius: 12px; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22);
-        padding: 24px 28px; width: min(640px, 94vw); max-height: 90vh; overflow-y: auto; background: #fff;
+        width: 95vw;
+        padding: 18px 16px;
     }
-    .clean-edit-dialog::backdrop { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(2px); }
-    .clean-edit-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #e7ebf0; }
-    .clean-edit-header h2 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #182232; }
-    .clean-edit-close { width: 32px; height: 32px; color: #566273; background: #f1f4f7; border: 0; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .clean-edit-close:hover { background: #e2e8f0; color: #1e293b; }
-    .clean-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-top: 14px; }
-    .clean-edit-full { grid-column: span 2; }
+
+    .clean-edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .clean-edit-full,
     .clean-edit-section-title {
-        grid-column: span 2; font-size: 11px; font-weight: 700; text-transform: uppercase;
-        letter-spacing: .06em; color: #64748b; margin: 10px 0 2px; padding-top: 8px; border-top: 1px solid #f1f5f9;
+        grid-column: span 1;
     }
-    .clean-edit-dialog label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; }
-    .clean-edit-dialog .form-input { min-height: 38px; height: 38px; font-size: 13px; width: 100%; box-sizing: border-box; }
-    .clean-edit-dialog textarea.form-input { min-height: 72px; height: auto; }
-    .clean-edit-footer {
-        display: flex; justify-content: flex-end; align-items: center; gap: 10px;
-        margin-top: 20px; padding-top: 14px; border-top: 1px solid #e7ebf0;
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 380px) {
+
+    .staff-page main.staff-main {
+        padding-right: 11px;
+        padding-left: 11px;
     }
-    .clean-edit-footer .button { min-height: 38px; padding: 7px 14px; font-size: 13px; }
-    .staff-sheet-sub { display: block; font-size: 11px; color: #7a8492; }
-    .staff-bottom-nav { display: none; }
-    .staff-mobile-more { position: relative; }
-    .staff-mobile-more-panel { position: absolute; right: 0; bottom: 54px; min-width: 190px; padding: 8px; background: #fff; border: 1px solid #e0e6ed; border-radius: 12px; box-shadow: 0 9px 28px #172a3d24; }
-    .staff-mobile-more-panel a, .staff-mobile-more-panel button { width: 100%; padding: 10px; display: block; color: #344154; background: transparent; border: 0; text-align: left; text-decoration: none; font: inherit; }
-    .staff-mobile-more-panel form { margin: 0; }
-    .staff-mobile-more-panel[hidden] { display: none; }
-    .staff-card-date { color: #667387; font-size: 12px; }
-    .staff-card-date strong { color: #344154; font-weight: 500; }
-    .staff-card-subjects { margin-top: 8px; }
-    .staff-card-actions { margin-top: 14px; display: flex; align-items: center; gap: 8px; }
-    .staff-page .pagination a { padding: 7px 12px; background: #fff; border: 1px solid #dfe5ec; border-radius: 7px; }
-    @media (max-width: 767px) {
-        .staff-sidebar { display: none; }
-        .staff-page main.staff-main { width: 100%; margin: 0; padding: 22px 14px 88px; }
-        .staff-heading-row { align-items: flex-start; flex-wrap: wrap; gap: 4px 8px; }
-        .staff-heading-tools { width: 100%; margin: 12px 0 0; }
-        .staff-filters { width: 100%; margin: 0 0 14px; display: flex; flex-wrap: wrap; justify-content: stretch; }
-        .staff-filter-search { width: 100%; }
-        .staff-filter-subject { width: calc(65% - 5px); }
-        .staff-filters .field { flex: auto; }
-        .staff-table-wrap { display: none; }
-        .mobile-enquiry-list { display: grid; gap: 10px; }
-        .staff-table-panel { overflow: visible; border: 0; background: transparent; }
-        .staff-list-page .staff-table-panel .mobile-enquiry-card { margin: 0; padding: 15px; border: 1px solid #e0e6ed; border-radius: 11px; box-shadow: none; }
-        .staff-list-page .staff-table-panel .mobile-enquiry-card.due-row { border-left: 1px solid #e0e6ed; background: #fff; }
-        .staff-card-top { display: flex; justify-content: space-between; gap: 10px; }
-        .staff-card-top .mobile-enquiry-name { color: #182232; font-weight: 700; }
-        .staff-bottom-nav { position: fixed; inset: auto 0 0; z-index: 30; height: 64px; padding: 5px 7px max(5px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-top: 1px solid #dfe6ee; }
-        .staff-bottom-nav > a, .staff-bottom-nav > button, .staff-bottom-nav summary { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #627083; background: transparent; border: 0; text-decoration: none; font: inherit; font-size: 10px; }
-        .staff-bottom-nav svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-        .staff-bottom-nav .active { color: #1740c8; }
-        .staff-bottom-nav .staff-mobile-more { list-style: none; }
-        .staff-mobile-more summary { cursor: pointer; list-style: none; }
-        .staff-mobile-more summary::-webkit-details-marker { display: none; }
-        .staff-mobile-more-panel { right: 0; bottom: 58px; }
-        .staff-toast { right: 12px; bottom: 76px; left: 12px; text-align: center; }
-        .clean-edit-dialog { width: 95vw; padding: 18px 16px; }
-        .clean-edit-grid { grid-template-columns: 1fr; }
-        .clean-edit-full { grid-column: span 1; }
-        .clean-edit-section-title { grid-column: span 1; }
+
+    .staff-list-heading {
+        font-size: 20px;
     }
+
+    .staff-card-actions .button {
+        font-size: 11px;
+    }
+}
+
 {% endblock %}
 
+
 {% block page_layout %}
-    {% if request.user.is_authenticated and request.user.is_staff %}
-        <svg aria-hidden="true" style="position:absolute;width:0;height:0">
-            <symbol id="nav-inbox" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM4 13h4l2 3h4l2-3h4"/></symbol>
-            <symbol id="nav-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
-            <symbol id="nav-play" viewBox="0 0 24 24"><path d="m9 6 10 6-10 6z"/></symbol>
-            <symbol id="nav-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
-            <symbol id="nav-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
-            <symbol id="nav-report" viewBox="0 0 24 24"><path d="M4 20V4m0 16h17M8 16v-5m5 5V7m5 9V9"/></symbol>
-            <symbol id="nav-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
-        </svg>
-        <div class="staff-layout">
-            <aside class="staff-sidebar" aria-label="Staff navigation">
-                <a class="staff-sidebar-brand" href="{% url 'staff:staff_list' %}">
-                    <img src="{% static 'tracker/logo.png' %}" alt="Giant Strides Online School">
+
+{% if request.user.is_authenticated and request.user.is_staff %}
+
+    {% include 'recruitment/includes/rec_nav.html' %}
+
+    <!-- SVG ICON DEFINITIONS -->
+
+    <svg aria-hidden="true"
+         style="position:absolute;width:0;height:0">
+
+        <symbol id="nav-inbox" viewBox="0 0 24 24">
+            <path d="M4 5h16v14H4zM4 13h4l2 3h4l2-3h4"/>
+        </symbol>
+
+        <symbol id="nav-check" viewBox="0 0 24 24">
+            <path d="m5 12 4 4L19 6"/>
+        </symbol>
+
+        <symbol id="nav-play" viewBox="0 0 24 24">
+            <path d="m9 6 10 6-10 6z"/>
+        </symbol>
+
+        <symbol id="nav-close" viewBox="0 0 24 24">
+            <path d="m6 6 12 12M18 6 6 18"/>
+        </symbol>
+
+        <symbol id="nav-calendar" viewBox="0 0 24 24">
+            <rect x="3" y="5" width="18" height="16" rx="2"/>
+            <path d="M16 3v4M8 3v4M3 10h18"/>
+        </symbol>
+
+        <symbol id="nav-report" viewBox="0 0 24 24">
+            <path d="M4 20V4m0 16h17M8 16v-5m5 5V7m5 9V9"/>
+        </symbol>
+
+        <symbol id="nav-more" viewBox="0 0 24 24">
+            <circle cx="5" cy="12" r="1"/>
+            <circle cx="12" cy="12" r="1"/>
+            <circle cx="19" cy="12" r="1"/>
+        </symbol>
+
+    </svg>
+
+
+    <div class="staff-layout">
+
+        <!-- ==================================
+             DESKTOP SIDEBAR
+        =================================== -->
+
+        <aside class="staff-sidebar"
+               aria-label="Staff navigation">
+
+            <a class="staff-sidebar-brand"
+               href="{% url 'staff:staff_list' %}">
+
+                <img src="{% static 'tracker/logo.png' %}"
+                     alt="Giant Strides Online School">
+
+            </a>
+
+
+            <nav class="staff-sidebar-nav">
+
+                <div class="staff-sidebar-section-label">
+                    ENQUIRY MANAGEMENT
+                </div>
+
+
+                <!-- NEW -->
+
+                <a class="staff-sidebar-link
+                    {% if request.GET.status == 'new' or request.path == '/tracker/' and not request.GET.status %}active{% endif %}"
+                   href="{% url 'staff:staff_list' %}?status=new">
+
+                    <svg><use href="#nav-inbox"></use></svg>
+
+                    <span>New Enquiries</span>
+
+                    <span class="staff-sidebar-count"
+                          data-nav-count="new">
+                        {{ staff_nav_counts.new|default:0 }}
+                    </span>
+
                 </a>
-                <nav class="staff-sidebar-nav">
-                    <a class="staff-sidebar-link{% if request.GET.status == 'new' or request.path == '/tracker/' and not request.GET.status %} active{% endif %}" href="{% url 'staff:staff_list' %}?status=new">
-                        <svg><use href="#nav-inbox"></use></svg><span>New</span><span class="staff-sidebar-count" data-nav-count="new">{{ staff_nav_counts.new|default:0 }}</span>
-                    </a>
-                    <a class="staff-sidebar-link{% if request.GET.status == 'assessment_booked' %} active{% endif %}" href="{% url 'staff:staff_list' %}?status=assessment_booked">
-                        <svg><use href="#nav-calendar"></use></svg><span>Assessment booked</span><span class="staff-sidebar-count" data-nav-count="assessment_booked">{{ staff_nav_counts.assessment_booked|default:0 }}</span>
-                    </a>
-                    <a class="staff-sidebar-link{% if request.GET.status == 'assessed' %} active{% endif %}" href="{% url 'staff:staff_list' %}?status=assessed">
-                        <svg><use href="#nav-check"></use></svg><span>Assessed</span><span class="staff-sidebar-count" data-nav-count="assessed">{{ staff_nav_counts.assessed|default:0 }}</span>
-                    </a>
-                    <a class="staff-sidebar-link{% if request.GET.status == 'started' %} active{% endif %}" href="{% url 'staff:staff_list' %}?status=started">
-                        <svg><use href="#nav-play"></use></svg><span>Started</span><span class="staff-sidebar-count" data-nav-count="started">{{ staff_nav_counts.started|default:0 }}</span>
-                    </a>
-                    <a class="staff-sidebar-link{% if request.GET.status == 'not_proceeding' %} active{% endif %}" href="{% url 'staff:staff_list' %}?status=not_proceeding">
-                        <svg><use href="#nav-close"></use></svg><span>Not proceeding</span><span class="staff-sidebar-count" data-nav-count="not_proceeding">{{ staff_nav_counts.not_proceeding|default:0 }}</span>
-                    </a>
-                    <div class="staff-sidebar-divider"></div>
-                    <a class="staff-sidebar-link followup-link{% if request.GET.status == 'followups_due' %} active{% endif %}" href="{% url 'staff:staff_list' %}?status=followups_due">
-                        <span class="staff-amber-dot"></span><span>Follow-ups due</span><span class="staff-sidebar-count" data-nav-count="followups_due">{{ staff_nav_counts.followups_due|default:0 }}</span>
-                    </a>
-                    <a class="staff-sidebar-link{% if request.path == '/tracker/report/' %} active{% endif %}" href="{% url 'staff:staff_report' %}">
-                        <svg><use href="#nav-report"></use></svg><span>Report</span>
-                    </a>
-                </nav>
-                <div class="staff-sidebar-bottom">
-                    <form action="{% url 'staff:staff_logout' %}" method="post">
-                        {% csrf_token %}
-                        <button class="staff-sidebar-link" type="submit"><svg><use href="#nav-close"></use></svg><span>Sign out</span></button>
-                    </form>
+
+
+                <!-- ASSESSMENT BOOKED -->
+
+                <a class="staff-sidebar-link
+                    {% if request.GET.status == 'assessment_booked' %}active{% endif %}"
+                   href="{% url 'staff:staff_list' %}?status=assessment_booked">
+
+                    <svg><use href="#nav-calendar"></use></svg>
+
+                    <span>Assessment Booked</span>
+
+                    <span class="staff-sidebar-count"
+                          data-nav-count="assessment_booked">
+                        {{ staff_nav_counts.assessment_booked|default:0 }}
+                    </span>
+
+                </a>
+
+
+                <!-- ASSESSED -->
+
+                <a class="staff-sidebar-link
+                    {% if request.GET.status == 'assessed' %}active{% endif %}"
+                   href="{% url 'staff:staff_list' %}?status=assessed">
+
+                    <svg><use href="#nav-check"></use></svg>
+
+                    <span>Assessed</span>
+
+                    <span class="staff-sidebar-count"
+                          data-nav-count="assessed">
+                        {{ staff_nav_counts.assessed|default:0 }}
+                    </span>
+
+                </a>
+
+
+                <!-- STARTED -->
+
+                <a class="staff-sidebar-link
+                    {% if request.GET.status == 'started' %}active{% endif %}"
+                   href="{% url 'staff:staff_list' %}?status=started">
+
+                    <svg><use href="#nav-play"></use></svg>
+
+                    <span>Started</span>
+
+                    <span class="staff-sidebar-count"
+                          data-nav-count="started">
+                        {{ staff_nav_counts.started|default:0 }}
+                    </span>
+
+                </a>
+
+
+                <!-- NOT PROCEEDING -->
+
+                <a class="staff-sidebar-link
+                    {% if request.GET.status == 'not_proceeding' %}active{% endif %}"
+                   href="{% url 'staff:staff_list' %}?status=not_proceeding">
+
+                    <svg><use href="#nav-close"></use></svg>
+
+                    <span>Not Proceeding</span>
+
+                    <span class="staff-sidebar-count"
+                          data-nav-count="not_proceeding">
+                        {{ staff_nav_counts.not_proceeding|default:0 }}
+                    </span>
+
+                </a>
+
+
+                <div class="staff-sidebar-divider"></div>
+
+
+                <!-- FOLLOW UPS -->
+
+                <a class="staff-sidebar-link followup-link
+                    {% if request.GET.status == 'followups_due' %}active{% endif %}"
+                   href="{% url 'staff:staff_list' %}?status=followups_due">
+
+                    <span class="staff-amber-dot"></span>
+
+                    <span>Follow-ups Due</span>
+
+                    <span class="staff-sidebar-count"
+                          data-nav-count="followups_due">
+                        {{ staff_nav_counts.followups_due|default:0 }}
+                    </span>
+
+                </a>
+
+
+                <!-- REPORT -->
+
+                <a class="staff-sidebar-link
+                    {% if request.path == '/tracker/report/' %}active{% endif %}"
+                   href="{% url 'staff:staff_report' %}">
+
+                    <svg><use href="#nav-report"></use></svg>
+
+                    <span>Reports & Analytics</span>
+
+                </a>
+
+
+                <div class="staff-sidebar-divider"></div>
+
+
+                <!-- TUTOR MANAGEMENT -->
+
+                <div class="staff-sidebar-section-label">
+                    TUTOR MANAGEMENT
                 </div>
-            </aside>
-            <main class="staff-main">
-                <div class="staff-main-inner">
-                    {% if messages %}
-                        <ul class="messages">{% for message in messages %}<li class="message">{{ message }}</li>{% endfor %}</ul>
-                    {% endif %}
-    {% else %}
-        <header class="site-header">
-            <div class="header-inner"><a class="brand" href="{% url 'tracker:enquiry_create' %}"><img src="{% static 'tracker/logo.png' %}" alt="Giant Strides Online School"></a></div>
-        </header>
-        <main>
-    {% endif %}
-    {% block content %}{% endblock %}
-    {% if request.user.is_authenticated and request.user.is_staff %}
-        </div></main></div>
-        <nav class="staff-bottom-nav" aria-label="Mobile staff navigation">
-            <a class="{% if request.GET.status == 'new' or request.path == '/tracker/' and not request.GET.status %}active{% endif %}" href="{% url 'staff:staff_list' %}?status=new"><svg><use href="#nav-inbox"></use></svg><span>New</span></a>
-            <a class="{% if request.GET.status == 'assessed' %}active{% endif %}" href="{% url 'staff:staff_list' %}?status=assessed"><svg><use href="#nav-check"></use></svg><span>Assessed</span></a>
-            <a class="{% if request.GET.status == 'started' %}active{% endif %}" href="{% url 'staff:staff_list' %}?status=started"><svg><use href="#nav-play"></use></svg><span>Started</span></a>
-            <details class="staff-mobile-more">
-                <summary><svg><use href="#nav-more"></use></svg><span>More</span></summary>
-                <div class="staff-mobile-more-panel">
-                    <a href="{% url 'staff:staff_list' %}?status=assessment_booked">Assessment booked (<span data-nav-count="assessment_booked">{{ staff_nav_counts.assessment_booked|default:0 }}</span>)</a>
-                    <a href="{% url 'staff:staff_list' %}?status=followups_due">Follow-ups due (<span data-nav-count="followups_due">{{ staff_nav_counts.followups_due|default:0 }}</span>)</a>
-                    <a href="{% url 'staff:staff_list' %}?status=not_proceeding">Not proceeding</a>
-                    <a href="{% url 'staff:staff_report' %}">Report</a>
-                    <form action="{% url 'staff:staff_logout' %}" method="post">{% csrf_token %}<button type="submit">Sign out</button></form>
-                </div>
-            </details>
-        </nav>
-    {% else %}
+
+
+                <!-- ADS SENT -->
+
+                <a href="{% url 'recruitment:ads_sent' %}"
+                   class="staff-sidebar-link">
+
+                    <span class="staff-nav-icon">📢</span>
+
+                    <span>Ads Sent</span>
+
+                    <span class="staff-sidebar-count">
+                        {{ ads_sent_count|default:0 }}
+                    </span>
+
+                </a>
+
+
+                <!-- TUTOR RESPONSES -->
+
+                <a href="{% url 'recruitment:ads_responded' %}"
+                   class="staff-sidebar-link">
+
+                    <span class="staff-nav-icon">👨‍🏫</span>
+
+                    <span>Tutor Responses</span>
+
+                    <span class="staff-sidebar-count">
+                        {{ pending_approvals_count|default:0 }}
+                    </span>
+
+                </a>
+
+
+                <!-- STUDENT REPORTS -->
+
+                <a href="{% url 'recruitment:student_reports' %}"
+                   class="staff-sidebar-link">
+
+                    <span class="staff-nav-icon">📄</span>
+
+                    <span>Student Reports</span>
+
+                </a>
+
+            </nav>
+
+
+            <!-- SIDEBAR BOTTOM -->
+
+            <div class="staff-sidebar-bottom">
+
+                <form action="{% url 'staff:staff_logout' %}"
+                      method="post">
+
+                    {% csrf_token %}
+
+                    <button class="staff-sidebar-link"
+                            type="submit">
+
+                        <svg><use href="#nav-close"></use></svg>
+
+                        <span>Sign Out</span>
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ==================================
+             MAIN CONTENT
+        =================================== -->
+
+        <main class="staff-main">
+
+            <div class="staff-main-inner">
+
+                <!-- DJANGO MESSAGES -->
+
+                {% if messages %}
+
+                    <ul class="messages">
+
+                        {% for message in messages %}
+
+                            <li class="message">
+                                {{ message }}
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% endif %}
+
+
+{% else %}
+
+    <!-- PUBLIC HEADER -->
+
+    <header class="site-header">
+
+        <div class="header-inner">
+
+            <a class="brand"
+               href="{% url 'tracker:enquiry_create' %}">
+
+                <img src="{% static 'tracker/logo.png' %}"
+                     alt="Giant Strides Online School">
+
+            </a>
+
+        </div>
+
+    </header>
+
+    <main>
+
+{% endif %}
+
+
+<!-- ==========================================
+     CHILD PAGE CONTENT
+=========================================== -->
+
+{% block content %}{% endblock %}
+
+
+{% if request.user.is_authenticated and request.user.is_staff %}
+
+
+            </div>
+
         </main>
-    {% endif %}
+
+    </div>
+
+
+    <!-- ======================================
+         MOBILE BOTTOM NAVIGATION
+    ======================================= -->
+
+    <nav class="staff-bottom-nav"
+         aria-label="Mobile staff navigation">
+
+
+        <!-- NEW -->
+
+        <a class="{% if request.GET.status == 'new' or request.path == '/tracker/' and not request.GET.status %}active{% endif %}"
+           href="{% url 'staff:staff_list' %}?status=new">
+
+            <svg><use href="#nav-inbox"></use></svg>
+
+            <span>New</span>
+
+        </a>
+
+
+        <!-- ASSESSED -->
+
+        <a class="{% if request.GET.status == 'assessed' %}active{% endif %}"
+           href="{% url 'staff:staff_list' %}?status=assessed">
+
+            <svg><use href="#nav-check"></use></svg>
+
+            <span>Assessed</span>
+
+        </a>
+
+
+        <!-- STARTED -->
+
+        <a class="{% if request.GET.status == 'started' %}active{% endif %}"
+           href="{% url 'staff:staff_list' %}?status=started">
+
+            <svg><use href="#nav-play"></use></svg>
+
+            <span>Started</span>
+
+        </a>
+
+
+        <!-- MORE MENU -->
+
+        <details class="staff-mobile-more">
+
+            <summary>
+
+                <svg><use href="#nav-more"></use></svg>
+
+                <span>More</span>
+
+            </summary>
+
+
+            <div class="staff-mobile-more-panel">
+
+
+                <a href="{% url 'staff:staff_list' %}?status=assessment_booked">
+
+                    Assessment Booked
+
+                    (<span data-nav-count="assessment_booked">
+                        {{ staff_nav_counts.assessment_booked|default:0 }}
+                    </span>)
+
+                </a>
+
+
+                <a href="{% url 'staff:staff_list' %}?status=followups_due">
+
+                    Follow-ups Due
+
+                    (<span data-nav-count="followups_due">
+                        {{ staff_nav_counts.followups_due|default:0 }}
+                    </span>)
+
+                </a>
+
+
+                <a href="{% url 'staff:staff_list' %}?status=not_proceeding">
+
+                    Not Proceeding
+
+                </a>
+
+
+                <a href="{% url 'staff:staff_report' %}">
+
+                    Reports & Analytics
+
+                </a>
+
+
+                <div class="staff-sidebar-divider"></div>
+
+
+                <a href="{% url 'recruitment:ads_sent' %}">
+
+                    📢 Ads Sent
+                    ({{ ads_sent_count|default:0 }})
+
+                </a>
+
+
+                <a href="{% url 'recruitment:ads_responded' %}">
+
+                    👨‍🏫 Tutor Responses
+                    ({{ pending_approvals_count|default:0 }})
+
+                </a>
+
+
+                <a href="{% url 'recruitment:student_reports' %}">
+
+                    📄 Student Reports
+
+                </a>
+
+
+                <div class="staff-sidebar-divider"></div>
+
+
+                <form action="{% url 'staff:staff_logout' %}"
+                      method="post">
+
+                    {% csrf_token %}
+
+                    <button type="submit">
+
+                        Sign Out
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </details>
+
+    </nav>
+
+
+{% else %}
+
+    </main>
+
+{% endif %}
+
 {% endblock %}

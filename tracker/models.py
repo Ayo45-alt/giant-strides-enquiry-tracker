@@ -1,9 +1,147 @@
 import re
 
 from django.conf import settings
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 
+
+COUNTRY_CODES = {
+    "nigeria": "NG",
+    "united kingdom": "UK",
+    "uk": "UK",
+    "great britain": "UK",
+    "united states": "US",
+    "united states of america": "US",
+    "usa": "US",
+    "canada": "CA",
+    "ghana": "GH",
+    "south africa": "ZA",
+    "kenya": "KE",
+    "ireland": "IE",
+    "australia": "AU",
+    "new zealand": "NZ",
+    "india": "IN",
+    "united arab emirates": "AE",
+    "uae": "AE",
+    "france": "FR",
+    "germany": "DE",
+    "italy": "IT",
+    "spain": "ES",
+    "netherlands": "NL",
+    "saudi arabia": "SA",
+    "qatar": "QA",
+    "singapore": "SG",
+    "malaysia": "MY",
+    "china": "CN",
+    "japan": "JP",
+    "cameroon": "CM",
+    "uganda": "UG",
+    "tanzania": "TZ",
+    "zambia": "ZM",
+    "zimbabwe": "ZW",
+    "rwanda": "RW",
+    "ethiopia": "ET",
+    "sierra leone": "SL",
+    "liberia": "LR",
+}
+
+
+def get_country_code(country):
+    """
+    Convert the family's country value into a country code.
+    """
+    country = (country or "").strip()
+
+    if not country:
+        return "XX"
+
+    normalized = country.casefold()
+
+    if normalized in COUNTRY_CODES:
+        return COUNTRY_CODES[normalized]
+
+    # Accept an already-supplied two-letter country code.
+    if re.fullmatch(r"[A-Za-z]{2}", country):
+        return country.upper()
+
+    raise ValueError(
+        f"Country '{country}' has no configured country code. "
+        "Add it to COUNTRY_CODES in tracker/models.py."
+    )
+
+
+def get_class_code(enquiry):
+    """
+    Convert school_year into a compact class code.
+
+    Examples:
+        Year 1     -> Y1
+        Y2         -> Y2
+        Primary 3  -> P3
+        JSS 1      -> JSS1
+        SS 2       -> SS2
+        Grade 4    -> G4
+    """
+    class_value = (
+        enquiry.school_year
+        or enquiry.proposed_classes
+        or ""
+    ).strip().upper()
+
+    if not class_value:
+        raise ValueError(
+            "Cannot generate an enrollment reference because "
+            "the student's class is missing."
+        )
+
+    patterns = [
+        (r"^(?:YEAR|Y)\s*(\d+)$", "Y"),
+        (r"^(?:PRIMARY|PRI|P)\s*(\d+)$", "P"),
+        (r"^(?:JSS|JHS)\s*(\d+)$", "JSS"),
+        (r"^(?:SS|SSS|SHS)\s*(\d+)$", "SS"),
+        (r"^(?:GRADE|GR)\s*(\d+)$", "G"),
+        (r"^(?:NURSERY|N)\s*(\d+)$", "N"),
+        (r"^(?:KG|KINDERGARTEN)\s*(\d+)$", "KG"),
+    ]
+
+    for pattern, prefix in patterns:
+        match = re.fullmatch(pattern, class_value)
+
+        if match:
+            return f"{prefix}{match.group(1)}"
+
+    # Accept already-standardized codes such as Y1 or P2.
+    if re.fullmatch(r"[A-Z]{1,4}\d{1,2}", class_value):
+        return class_value
+
+    raise ValueError(
+        f"Cannot convert class '{class_value}' into a reference code. "
+        "Please standardize the school_year value."
+    )
+
+
+def get_next_monthly_enrollment_number(year, month):
+    """
+    Get the next portal-wide enrollment number for a given month.
+    """
+    with transaction.atomic():
+        counter, created = MonthlyEnrollmentSequence.objects.get_or_create(
+            year=year,
+            month=month,
+            defaults={"last_number": 0},
+        )
+
+        # Lock the counter row while allocating the next number.
+        counter = (
+            MonthlyEnrollmentSequence.objects
+            .select_for_update()
+            .get(pk=counter.pk)
+        )
+
+        counter.last_number += 1
+        counter.save(update_fields=["last_number"])
+
+        return counter.last_number
 
 def normalize_phone_number(phone):
     return re.sub(r"[\s\-()\[\]{}]", "", phone or "")
@@ -39,6 +177,22 @@ class Family(models.Model):
     def __str__(self):
         return f"{self.parent_name} ({self.parent_phone})"
 
+class MonthlyEnrollmentSequence(models.Model):
+    year = models.PositiveSmallIntegerField()
+    month = models.PositiveSmallIntegerField()
+    last_number = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["year", "month"],
+                name="unique_monthly_enrollment_sequence",
+            )
+        ]
+        ordering = ["-year", "-month"]
+
+    def __str__(self):
+        return f"{self.year}-{self.month:02d}: {self.last_number}"
 
 class Enquiry(models.Model):
     STATUS = [
@@ -82,8 +236,12 @@ class Enquiry(models.Model):
 
     def save(self, *args, **kwargs):
         changed_by = kwargs.pop("changed_by", None)
+
         update_fields = kwargs.get("update_fields")
-        update_field_names = set(update_fields) if update_fields is not None else None
+        update_field_names = (
+            set(update_fields) if update_fields is not None else None
+        )
+
         is_new = self._state.adding
         previous_status = None
 
@@ -97,18 +255,45 @@ class Enquiry(models.Model):
             )
 
         status_changed = is_new or (
-            previous_status is not None and previous_status != self.status
+            previous_status is not None
+            and previous_status != self.status
         )
+
         if status_changed:
             self.status_changed_at = timezone.now()
+
             if update_field_names is not None:
-                kwargs["update_fields"] = update_field_names | {"status_changed_at"}
+                kwargs["update_fields"] = (
+                    update_field_names | {"status_changed_at"}
+                )
 
         with transaction.atomic():
+            # Save first so that a new enquiry receives its database ID.
             super().save(*args, **kwargs)
-            if not self.reference and self.pk:
-                self.reference = f"GS-{self.pk:04d}"
-                type(self).objects.filter(pk=self.pk).update(reference=self.reference)
+
+            # Generate a reference only when one does not already exist.
+            if not self.reference:
+                enrollment_date = timezone.localdate()
+
+                country_code = get_country_code(self.family.country)
+                class_code = get_class_code(self)
+
+                sequence = get_next_monthly_enrollment_number(
+                    year=enrollment_date.year,
+                    month=enrollment_date.month,
+                )
+
+                self.reference = (
+                    f"GS-{country_code}-{class_code}-"
+                    f"{enrollment_date.strftime('%y%m')}"
+                    f"{sequence:02d}"
+                )
+
+                # Update the reference without triggering save() again.
+                type(self).objects.filter(pk=self.pk).update(
+                    reference=self.reference
+                )
+
             if status_changed:
                 StageChange.objects.create(
                     enquiry=self,
@@ -164,3 +349,41 @@ class StageChange(models.Model):
 
     def __str__(self):
         return f"{self.enquiry}: {self.from_status or 'Created'} to {self.to_status}"
+
+
+class StudentMeeting(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("ready", "Ready"),
+    ]
+
+    enquiry = models.OneToOneField(
+        Enquiry,
+        on_delete=models.CASCADE,
+        related_name="meeting",
+    )
+
+    meet_url = models.URLField(
+        max_length=500,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+
+    google_calendar_event_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Google Meet - {self.enquiry.child_name}"

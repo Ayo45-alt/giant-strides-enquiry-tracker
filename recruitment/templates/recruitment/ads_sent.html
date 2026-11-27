@@ -1,0 +1,120 @@
+
+{% extends "recruitment/base_recruitment.html" %}
+
+{% block title %}Ads Sent{% endblock %}
+
+{% block recruitment_content %}
+
+<div class="gs-header">
+    <div>
+        <h1>📢 Successfully Dispatched Ads</h1>
+
+        <div class="gs-subtitle">
+            Only advertisements with a confirmed successful dispatch
+            are displayed here. Unfilled subjects may be eligible for
+            the 12-hour reminder workflow.
+        </div>
+    </div>
+</div>
+
+<div class="gs-card">
+    <table class="gs-table">
+        <thead>
+            <tr>
+                <th>Ref ID</th>
+                <th>Student & Country</th>
+                <th>Subjects Status</th>
+                <th>Last Successful Dispatch</th>
+                <th>12-Hr Auto-Resend</th>
+                <th>Applicants</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for ad in ads %}
+            <tr>
+                <td>
+                    <strong>{{ ad.ref_code }}</strong>
+                    <div>
+                        <span class="gs-tag gs-tag-filled">
+                            Successfully Sent
+                        </span>
+                    </div>
+                </td>
+
+                <td>
+                    <strong>{{ ad.enquiry.child_name }}</strong>
+
+                    <br>
+
+                    <span style="color:#64748b; font-size:0.8rem;">
+                        {{ ad.enquiry.family.country|default:"Online" }}
+                        • Parent: {{ ad.enquiry.family.parent_name }}
+                    </span>
+                </td>
+
+                <td>
+                    {% with unassigned=ad.get_unassigned_subjects %}
+                        {% for sub in ad.enquiry.subjects.all %}
+                            {% if sub in unassigned %}
+                                <span class="gs-tag gs-tag-open">
+                                    ⏳ {{ sub.name }} (Vacant)
+                                </span>
+                            {% else %}
+                                <span class="gs-tag gs-tag-filled">
+                                    ✅ {{ sub.name }} (Assigned)
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </td>
+
+                <td>
+                    {% if ad.last_sent_at %}
+                        {{ ad.last_sent_at|date:"M d, Y • H:i" }}
+                    {% else %}
+                        Not recorded
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if not ad.get_unassigned_subjects %}
+                        <span class="gs-tag gs-tag-filled">
+                            All Subjects Filled
+                        </span>
+                    {% elif ad.reminder_sent %}
+                        <span class="gs-tag gs-tag-info">
+                            12-Hr Reminder Sent
+                        </span>
+                    {% else %}
+                        <span class="gs-tag gs-tag-open">
+                            Armed (12h Window)
+                        </span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a
+                        href="{% url 'recruitment:ads_responded' %}"
+                        class="gs-btn gs-btn-outline"
+                    >
+                        {{ ad.applications.count }} Response(s)
+                    </a>
+                </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td
+                    colspan="6"
+                    style="text-align:center; padding:2rem; color:#64748b;"
+                >
+                    No successfully dispatched advertisements yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

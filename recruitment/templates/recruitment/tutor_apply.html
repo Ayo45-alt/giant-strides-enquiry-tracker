@@ -1,0 +1,52 @@
+<!-- templates/recruitment/tutor_apply.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Application — {{ job_ad.ref_code }} | Giant Strides</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; margin: 0; padding: 2rem 1rem; }
+    .form-box { max-width: 560px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .field { margin-bottom: 1.1rem; }
+    label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.35rem; }
+    input, select { width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; }
+    button { width: 100%; background: #1e3a8a; color: #fff; border: none; padding: 0.75rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <img src="{% static 'tracker/logo.png' %}" alt="Giant Strides" style="height:44px; margin-bottom:1rem;">
+    <h2 style="margin:0 0 0.25rem 0;">Tutor Position Application</h2>
+    <p style="color:#64748b; font-size:0.9rem; margin-top:0;">
+      Job Ref: <strong>{{ job_ad.ref_code }}</strong> • Student: <strong>{{ job_ad.enquiry.child_name }}</strong> ({{ job_ad.enquiry.family.country|default:"Online" }})
+    </p>
+
+    {% if available_subjects %}
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="field">
+        <label>Subject You Are Applying For *</label>
+        <select name="subject" required>
+          {% for sub in available_subjects %}
+            <option value="{{ sub.id }}">{{ sub.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field"><label>Full Name *</label><input type="text" name="full_name" required></div>
+      <div class="field"><label>Email Address *</label><input type="email" name="email" required></div>
+      <div class="field"><label>WhatsApp Number (with country code, e.g. +234...) *</label><input type="text" name="whatsapp_number" required></div>
+      <div class="field"><label>Years of Teaching Experience *</label><input type="number" name="years_of_experience" min="0" required></div>
+      <div class="field"><label>Demo Video Link (YouTube / Google Drive) *</label><input type="url" name="demo_video" placeholder="https://..." required></div>
+      <div class="field"><label>Upload CV (PDF / DOCX) *</label><input type="file" name="cv" accept=".pdf,.doc,.docx" required></div>
+      <button type="submit">Submit Tutor Application</button>
+    </form>
+    {% else %}
+      <div style="background:#fef3c7; color:#92400e; padding:1rem; border-radius:8px; font-weight:600;">
+        All subjects for this student have already been filled. Keep an eye on the tutors group for upcoming openings!
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!-- templates/recruitment/student_full_detail.html -->
+{% extends "recruitment/base_recruitment.html" %}
+{% block title %}{{ enquiry.child_name }} - Full Profile{% endblock %}
+
+{% block recruitment_content %}
+<div class="gs-header">
+  <div>
+    <h1>🎓 {{ enquiry.child_name }} — Complete Student Record</h1>
+    <div class="gs-subtitle">Reference: {{ enquiry.reference }} • Current Status: <strong>{{ enquiry.get_status_display }}</strong></div>
+  </div>
+  <div style="display:flex; gap:0.5rem;">
+    <a href="{% url 'recruitment:download_report_docx' enquiry.id %}" class="gs-btn gs-btn-primary">⬇️ Download Report (.DOCX)</a>
+  </div>
+</div>
+
+<!-- Stage 1: Enquiry & Family Details -->
+<div class="gs-card">
+  <div class="gs-card-header"><strong>1. Initial Enquiry & Family Profile</strong></div>
+  <div class="gs-card-body" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; font-size:0.9rem;">
+    <div><strong>Parent / Guardian:</strong><br>{{ enquiry.family.parent_name }}</div>
+    <div><strong>WhatsApp / Phone:</strong><br>{{ enquiry.family.parent_phone }}</div>
+    <div><strong>Email:</strong><br>{{ enquiry.family.parent_email|default:"—" }}</div>
+    <div><strong>Country & Timezone:</strong><br>{{ enquiry.family.country|default:"—" }} ({{ enquiry.time_zone|default:"—" }})</div>
+    <div><strong>School Year:</strong><br>{{ enquiry.school_year }}</div>
+    <div><strong>Subjects Requested:</strong><br>{% for s in enquiry.subjects.all %}<span class="gs-tag gs-tag-info">{{ s.name }}</span>{% endfor %}</div>
+    <div style="grid-column: 1 / -1;"><strong>Enquiry Notes:</strong><br>{{ enquiry.notes|default:"No notes recorded." }}</div>
+  </div>
+</div>
+
+<!-- Stage 2: Assigned Tutors & Assessment Schedule -->
+<div class="gs-card">
+  <div class="gs-card-header"><strong>2. Assigned Tutors & Assessment Sessions</strong></div>
+  <table class="gs-table">
+    <thead>
+      <tr><th>Subject</th><th>Assigned Tutor</th><th>Contact</th><th>Date & Time</th><th>Meeting Link</th></tr>
+    </thead>
+    <tbody>
+      {% for app in approved_apps %}
+      <tr>
+        <td><strong>{{ app.subject.name }}</strong></td>
+        <td>{{ app.full_name }} ({{ app.years_of_experience }} yrs exp)</td>
+        <td>{{ app.whatsapp_number }}<br><small>{{ app.email }}</small></td>
+        <td>{{ app.assessment_date|date:"M d, Y" }} at {{ app.assessment_time|time:"H:i" }}</td>
+        <td><a href="{{ app.assessment_link }}" target="_blank" class="gs-btn gs-btn-outline">Join Link</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" style="color:#64748b;">No tutors approved yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Stage 3: Post-Assessment Reports -->
+<div class="gs-card">
+  <div class="gs-card-header"><strong>3. Post-Assessment Evaluations</strong></div>
+  <div class="gs-card-body">
+    {% for app in approved_apps %}
+      <div style="margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid #e2e8f0;">
+        <h4 style="margin:0 0 0.5rem 0; color:#1e3a8a;">{{ app.subject.name }} ({{ app.full_name }})</h4>
+        {% if app.report %}
+          <p><strong>Current Level:</strong> {{ app.report.current_level }}</p>
+          <p><strong>Strengths:</strong> {{ app.report.academic_strengths }}</p>
+          <p><strong>Areas for Improvement:</strong> {{ app.report.areas_for_improvement }}</p>
+          <p><strong>Recommendations:</strong> {{ app.report.recommendations }}</p>
+        {% else %}
+          <span class="gs-tag gs-tag-open">Report Not Yet Submitted</span>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p style="color:#64748b;">No assessment reports available yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

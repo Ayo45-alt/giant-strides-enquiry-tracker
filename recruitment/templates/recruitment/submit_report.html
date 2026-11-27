@@ -1,0 +1,48 @@
+<!-- templates/recruitment/submit_report.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Assessment Report | Giant Strides</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; margin: 0; padding: 2rem 1rem; }
+    .form-box { max-width: 620px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .field { margin-bottom: 1.15rem; }
+    label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
+    textarea { width: 100%; padding: 0.65rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; min-height: 95px; box-sizing: border-box; font-family: inherit; }
+    button { width: 100%; background: #15803d; color: #fff; border: none; padding: 0.8rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <img src="{% static 'tracker/logo.png' %}" alt="Giant Strides" style="height:44px; margin-bottom:1rem;">
+    <h2 style="margin:0 0 0.25rem 0;">Post-Assessment Evaluation Report</h2>
+    <p style="color:#64748b; font-size:0.9rem; margin-top:0;">
+      Student: <strong>{{ application.job_ad.enquiry.child_name }}</strong> • Subject: <strong>{{ application.subject.name }}</strong> • Tutor: <strong>{{ application.full_name }}</strong>
+    </p>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="field">
+        <label>1. Student's Current Learning Level *</label>
+        <textarea name="current_level" placeholder="Describe the student's current grasp of foundational concepts..." required></textarea>
+      </div>
+      <div class="field">
+        <label>2. Academic Strengths Observed *</label>
+        <textarea name="academic_strengths" placeholder="Highlight topics or skills where the student excelled..." required></textarea>
+      </div>
+      <div class="field">
+        <label>3. Areas Requiring Improvement *</label>
+        <textarea name="areas_for_improvement" placeholder="Note specific gaps or topics needing structured support..." required></textarea>
+      </div>
+      <div class="field">
+        <label>4. Recommended Learning Plan & Frequency *</label>
+        <textarea name="recommendations" placeholder="Suggest lesson frequency, focus areas, and learning approach..." required></textarea>
+      </div>
+      <button type="submit">Submit Official Assessment Report</button>
+    </form>
+  </div>
+</body>
+</html>

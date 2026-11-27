@@ -5,3 +5,30 @@ __pycache__/
 *.pyc
 db.sqlite3
 .env
+# Google OAuth credentials
+google_calendar_token.json
+
+# Local databases and backups
+*.sqlite3
+*.sqlite3-journal
+*.db
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+credentials.json
+token.json
+google_calendar_token.json
+*.pem
+*.key
+
+# Private uploads and generated reports
+media/
+private_media/
+
+# Deployment and generated files
+.vercel/
+staticfiles/
+.pytest_cache/
+.coverage

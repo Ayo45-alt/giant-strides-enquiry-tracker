@@ -1,0 +1,594 @@
+{# templates/recruitment/ads_reversed.html #}
+{% extends "recruitment/base_recruitment.html" %}
+
+{% block title %}Reversed Advertisements | Giant Strides{% endblock %}
+
+{% block recruitment_content %}
+
+<style>
+    .gs-reversed-page {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .gs-reversed-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .gs-reversed-header h1 {
+        margin: 0;
+        font-size: 1.65rem;
+        font-weight: 750;
+        letter-spacing: -0.035em;
+        color: #172554;
+    }
+
+    .gs-reversed-header .gs-subtitle {
+        margin-top: 0.55rem;
+        max-width: 650px;
+        line-height: 1.65;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .gs-reversed-header-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: #fff1f2;
+        color: #be123c;
+        font-size: 1.4rem;
+    }
+
+    .gs-reversed-title-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .gs-reversed-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .gs-reversed-stat {
+        padding: 1.2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #fff;
+    }
+
+    .gs-reversed-stat-label {
+        color: #64748b;
+        font-size: 0.78rem;
+        font-weight: 650;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+    }
+
+    .gs-reversed-stat-value {
+        margin-top: 0.55rem;
+        color: #172554;
+        font-size: 1.7rem;
+        font-weight: 750;
+        line-height: 1.2;
+    }
+
+    .gs-reversed-stat-description {
+        margin-top: 0.4rem;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        line-height: 1.5;
+    }
+
+    .gs-reversed-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
+        padding: 1rem 1.1rem;
+        border: 1px solid #fecdd3;
+        border-radius: 12px;
+        background: #fff7f8;
+        color: #881337;
+        font-size: 0.86rem;
+        line-height: 1.6;
+    }
+
+    .gs-reversed-notice-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .gs-reversed-notice strong {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-weight: 750;
+    }
+
+    .gs-reversed-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .gs-reversed-card-heading {
+        color: #172554;
+        font-size: 1rem;
+        font-weight: 750;
+    }
+
+    .gs-reversed-card-description {
+        margin-top: 0.35rem;
+        color: #64748b;
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+    .gs-reversed-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        background: #fff1f2;
+        color: #be123c;
+        font-size: 0.78rem;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .gs-reversed-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .gs-reversed-table {
+        width: 100%;
+        min-width: 1050px;
+    }
+
+    .gs-reversed-table th {
+        white-space: nowrap;
+    }
+
+    .gs-reversed-table td {
+        vertical-align: middle;
+    }
+
+    .gs-reversed-reference {
+        color: #1d4ed8;
+        font-weight: 750;
+        font-size: 0.86rem;
+        letter-spacing: 0.015em;
+    }
+
+    .gs-reversed-student {
+        color: #172554;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .gs-reversed-secondary {
+        margin-top: 0.3rem;
+        color: #94a3b8;
+        font-size: 0.77rem;
+    }
+
+    .gs-reversed-date {
+        color: #334155;
+        font-size: 0.83rem;
+        font-weight: 650;
+        white-space: nowrap;
+    }
+
+    .gs-reversed-time {
+        margin-top: 0.25rem;
+        color: #94a3b8;
+        font-size: 0.75rem;
+    }
+
+    .gs-reversed-reason {
+        max-width: 270px;
+        color: #475569;
+        font-size: 0.82rem;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    .gs-reversed-reason-empty {
+        color: #94a3b8;
+        font-size: 0.8rem;
+        font-style: italic;
+    }
+
+    .gs-reversed-app-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.6rem;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .gs-reversed-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .gs-reversed-actions .gs-btn {
+        white-space: nowrap;
+        font-size: 0.77rem;
+    }
+
+    .gs-reversed-empty {
+        padding: 3.5rem 1.5rem !important;
+        text-align: center;
+    }
+
+    .gs-reversed-empty-icon {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        border-radius: 20px;
+        background: #f1f5f9;
+        font-size: 1.8rem;
+    }
+
+    .gs-reversed-empty h3 {
+        margin: 0;
+        color: #172554;
+        font-size: 1rem;
+        font-weight: 750;
+    }
+
+    .gs-reversed-empty p {
+        max-width: 390px;
+        margin: 0.55rem auto 0;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        line-height: 1.65;
+    }
+
+    @media (max-width: 850px) {
+        .gs-reversed-summary {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .gs-reversed-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .gs-reversed-header h1 {
+            font-size: 1.35rem;
+        }
+
+        .gs-reversed-header-icon {
+            width: 42px;
+            height: 42px;
+        }
+    }
+</style>
+
+
+<div class="gs-reversed-page">
+
+    <!-- PAGE HEADER -->
+    <div class="gs-header gs-reversed-header">
+
+        <div class="gs-reversed-title-group">
+
+            <div class="gs-reversed-header-icon">
+                ↩️
+            </div>
+
+            <div>
+                <h1>Reversed Advertisements</h1>
+
+                <div class="gs-subtitle">
+                    Review recruitment advertisements that have been
+                    explicitly withdrawn or reversed. Monitor their
+                    reversal history, associated tutor applications
+                    and student records.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY STATISTICS -->
+    <div class="gs-reversed-summary">
+
+        <div class="gs-reversed-stat">
+            <div class="gs-reversed-stat-label">
+                Reversed Advertisements
+            </div>
+
+            <div class="gs-reversed-stat-value">
+                {{ ads|length }}
+            </div>
+
+            <div class="gs-reversed-stat-description">
+                Total advertisements in reversal history
+            </div>
+        </div>
+
+
+        <div class="gs-reversed-stat">
+            <div class="gs-reversed-stat-label">
+                Existing Responses
+            </div>
+
+            <div class="gs-reversed-stat-value">
+                {% with total_responses=0 %}
+                    {% for ad in ads %}
+                        {{ ad.applications.count|add:total_responses }}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <div class="gs-reversed-stat-description">
+                Tutor applications associated with these advertisements
+            </div>
+        </div>
+
+
+        <div class="gs-reversed-stat">
+            <div class="gs-reversed-stat-label">
+                Advertisement Status
+            </div>
+
+            <div class="gs-reversed-stat-value" style="font-size:1.15rem;">
+                Reversed
+            </div>
+
+            <div class="gs-reversed-stat-description">
+                These advertisements are not accepting new applications
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- LIFECYCLE NOTICE -->
+    <div class="gs-reversed-notice">
+
+        <div class="gs-reversed-notice-icon">
+            <span aria-hidden="true">ⓘ</span>
+        </div>
+
+        <div>
+            <strong>Reversal is an explicit administrative action.</strong>
+
+            Reversed advertisements are excluded from active recruitment.
+            They are not automatically reactivated or redistributed.
+            Existing tutor applications remain available for historical review.
+        </div>
+
+    </div>
+
+
+    <!-- REVERSAL HISTORY -->
+    <div class="gs-card">
+
+        <div class="gs-card-header gs-reversed-card-header">
+
+            <div>
+                <div class="gs-reversed-card-heading">
+                    Reversal History
+                </div>
+
+                <div class="gs-reversed-card-description">
+                    A record of advertisements marked as reversed,
+                    including their associated student and application history.
+                </div>
+            </div>
+
+            <span class="gs-reversed-count">
+                {{ ads|length }} Reversed Ad(s)
+            </span>
+
+        </div>
+
+
+        <div class="gs-reversed-table-wrap">
+
+            <table class="gs-table gs-reversed-table">
+
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Student</th>
+                        <th>Last Dispatch Record</th>
+                        <th>Reversed At</th>
+                        <th>Reversal Reason</th>
+                        <th>Responses</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    {% for ad in ads %}
+
+                    <tr>
+
+                        <!-- REFERENCE -->
+                        <td>
+                            <span class="gs-reversed-reference">
+                                {{ ad.ref_code }}
+                            </span>
+
+                            <div class="gs-reversed-secondary">
+                                Created {{ ad.created_at|date:"M d, Y" }}
+                            </div>
+                        </td>
+
+
+                        <!-- STUDENT -->
+                        <td>
+                            <div class="gs-reversed-student">
+                                {{ ad.enquiry.child_name }}
+                            </div>
+
+                            <div class="gs-reversed-secondary">
+                                {{ ad.enquiry.family.country|default:"Online" }}
+                            </div>
+                        </td>
+
+
+                        <!-- LAST DISPATCH RECORD -->
+                        <td>
+                            {% if ad.last_sent_at %}
+
+                                <div class="gs-reversed-date">
+                                    {{ ad.last_sent_at|date:"M d, Y" }}
+                                </div>
+
+                                <div class="gs-reversed-time">
+                                    {{ ad.last_sent_at|time:"H:i" }}
+                                </div>
+
+                            {% else %}
+
+                                <span class="gs-reversed-secondary">
+                                    Not recorded
+                                </span>
+
+                            {% endif %}
+                        </td>
+
+
+                        <!-- REVERSAL TIMESTAMP -->
+                        <td>
+                            {% if ad.reversed_at %}
+
+                                <div class="gs-reversed-date">
+                                    {{ ad.reversed_at|date:"M d, Y" }}
+                                </div>
+
+                                <div class="gs-reversed-time">
+                                    {{ ad.reversed_at|time:"H:i" }}
+                                </div>
+
+                            {% else %}
+
+                                <span class="gs-reversed-secondary">
+                                    Timestamp unavailable
+                                </span>
+
+                            {% endif %}
+                        </td>
+
+
+                        <!-- REVERSAL REASON -->
+                        <td>
+                            {% if ad.reversal_reason %}
+
+                                <div class="gs-reversed-reason">
+                                    {{ ad.reversal_reason|linebreaksbr }}
+                                </div>
+
+                            {% else %}
+
+                                <span class="gs-reversed-reason-empty">
+                                    No reason recorded
+                                </span>
+
+                            {% endif %}
+                        </td>
+
+
+                        <!-- APPLICATION COUNT -->
+                        <td>
+                            <span class="gs-reversed-app-count">
+                                {{ ad.applications.count }}
+                                Response(s)
+                            </span>
+                        </td>
+
+
+                        <!-- ACTIONS -->
+                        <td>
+                            <div class="gs-reversed-actions">
+
+                                <a
+                                    href="{% url 'recruitment:ads_responded' %}"
+                                    class="gs-btn gs-btn-outline"
+                                    title="Review tutor application history"
+                                >
+                                    Responses
+                                </a>
+
+                                <a
+                                    href="{% url 'recruitment:student_full_detail' ad.enquiry.id %}"
+                                    class="gs-btn gs-btn-outline"
+                                    title="View the full student profile"
+                                >
+                                    Profile
+                                </a>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="7" class="gs-reversed-empty">
+
+                            <div class="gs-reversed-empty-icon">
+                                ↩️
+                            </div>
+
+                            <h3>No Reversed Advertisements</h3>
+
+                            <p>
+                                There are currently no advertisements
+                                in the reversal history. When an
+                                advertisement is explicitly reversed,
+                                its record will appear here.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
