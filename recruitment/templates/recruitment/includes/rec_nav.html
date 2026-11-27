@@ -1,0 +1,42 @@
+
+{# templates/recruitment/includes/rec_nav.html #}
+
+<nav class="gs-rec-nav" aria-label="Recruitment navigation">
+
+    <a
+        href="{% url 'recruitment:ads_sent' %}"
+        class="gs-nav-pill {% if request.resolver_match.url_name == 'ads_sent' %}active{% endif %}"
+        {% if request.resolver_match.url_name == 'ads_sent' %}aria-current="page"{% endif %}
+    >
+        <span class="gs-nav-icon">📢</span>
+        <span class="gs-nav-label">Ads Sent</span>
+        <span class="gs-badge gs-badge-blue">
+            {{ ads_sent_count|default:0 }}
+        </span>
+    </a>
+
+    <a
+        href="{% url 'recruitment:ads_responded' %}"
+        class="gs-nav-pill {% if request.resolver_match.url_name == 'ads_responded' or request.resolver_match.url_name == 'approve_tutor' %}active{% endif %}"
+        {% if request.resolver_match.url_name == 'ads_responded' or request.resolver_match.url_name == 'approve_tutor' %}aria-current="page"{% endif %}
+    >
+        <span class="gs-nav-icon">👨‍🏫</span>
+        <span class="gs-nav-label">Tutor Responses</span>
+        <span class="gs-badge gs-badge-amber">
+            {{ pending_approvals_count|default:0 }}
+        </span>
+    </a>
+
+    <a
+        href="{% url 'recruitment:student_reports' %}"
+        class="gs-nav-pill {% if request.resolver_match.url_name == 'student_reports' or request.resolver_match.url_name == 'student_full_detail' or request.resolver_match.url_name == 'download_report_docx' or request.resolver_match.url_name == 'email_report_docx' %}active{% endif %}"
+        {% if request.resolver_match.url_name == 'student_reports' or request.resolver_match.url_name == 'student_full_detail' or request.resolver_match.url_name == 'download_report_docx' or request.resolver_match.url_name == 'email_report_docx' %}aria-current="page"{% endif %}
+    >
+        <span class="gs-nav-icon">📄</span>
+        <span class="gs-nav-label">Student Reports</span>
+        <span class="gs-badge gs-badge-green">
+            {{ completed_reports_count|default:0 }}
+        </span>
+    </a>
+
+</nav>

@@ -1,0 +1,635 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Assessment Report Submitted | Giant Strides</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --blue: #0649CE;
+            --blue-dark: #033BAA;
+            --yellow: #FFCC24;
+            --cream: #FFFBE7;
+            --dark: #101828;
+            --text: #596579;
+            --green: #16A34A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            background:
+                radial-gradient(circle at 85% 10%, #FFF1B9, transparent 35%),
+                linear-gradient(135deg, #FFFBE7, #F8F9F5);
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        header {
+            background: rgba(255,255,255,.96);
+            padding: 18px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo img {
+            width: 105px;
+        }
+
+        .home-link {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* MAIN */
+
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 65px 24px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr .85fr;
+            gap: 55px;
+            align-items: center;
+        }
+
+        .content {
+            max-width: 580px;
+        }
+
+        .success-icon {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background: #DCFCE7;
+            border: 7px solid #F0FDF4;
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: #FFF0A8;
+            color: #A87500;
+            padding: 11px 18px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: clamp(36px, 5vw, 55px);
+            line-height: 1.13;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 22px;
+        }
+
+        h1 span {
+            color: var(--blue);
+        }
+
+        .intro {
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.9;
+            margin-bottom: 28px;
+        }
+
+        /* REPORT REFERENCE */
+
+        .report-reference {
+            background: white;
+            border: 1px solid #E9EAF0;
+            border-radius: 14px;
+            padding: 19px 22px;
+            margin-bottom: 28px;
+        }
+
+        .report-reference small {
+            color: #8490A3;
+            font-size: 11px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .report-reference strong {
+            color: var(--blue);
+            font-size: 15px;
+        }
+
+        /* REPORT SUMMARY */
+
+        .summary {
+            display: grid;
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .summary-icon {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            background: #E6EEFF;
+            color: var(--blue);
+            font-size: 20px;
+        }
+
+        .summary-item h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .summary-item p {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* STORY CARD */
+
+        .story-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(16,24,40,.08);
+        }
+
+        .story-image {
+            min-height: 260px;
+            background:
+                linear-gradient(180deg, rgba(6,73,206,.03), rgba(6,73,206,.15)),
+                url("{% static 'tracker/images/tutor-learning.jpg' %}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .story-content {
+            padding: 30px;
+        }
+
+        .story-content h2 {
+            font-size: 25px;
+            line-height: 1.3;
+            margin-bottom: 14px;
+        }
+
+        .story-content h2 span {
+            color: var(--blue);
+        }
+
+        .story-content p {
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        .quote {
+            margin-top: 22px;
+            background: var(--cream);
+            border-left: 4px solid var(--yellow);
+            border-radius: 0 12px 12px 0;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+            font-weight: 600;
+        }
+
+        /* NEXT STEPS */
+
+        .next-section {
+            margin-top: 80px;
+        }
+
+        .section-heading {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .section-heading span {
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .section-heading h2 {
+            font-size: 29px;
+            margin-top: 10px;
+            letter-spacing: -1px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .step-card {
+            background: white;
+            padding: 27px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(16,24,40,.04);
+        }
+
+        .step-number {
+            width: 38px;
+            height: 38px;
+            background: #E6EEFF;
+            color: var(--blue);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+        .step-card h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .step-card p {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* CLOSING */
+
+        .closing {
+            margin-top: 55px;
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+            background: var(--blue);
+            border-radius: 22px;
+        }
+
+        .closing h2 {
+            font-size: 25px;
+            margin-bottom: 12px;
+        }
+
+        .closing p {
+            max-width: 680px;
+            margin: auto;
+            font-size: 14px;
+            line-height: 1.9;
+            color: #E4ECFF;
+        }
+
+        .btn {
+            display: inline-flex;
+            margin-top: 28px;
+            padding: 15px 27px;
+            border-radius: 50px;
+            background: white;
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 28px 15px;
+            color: #8490A3;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        footer strong {
+            color: var(--blue);
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 850px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .story-card {
+                max-width: 600px;
+                margin: auto;
+            }
+        }
+
+        @media(max-width: 550px) {
+            main {
+                padding: 45px 18px;
+            }
+
+            h1 {
+                font-size: 39px;
+                letter-spacing: -1.5px;
+            }
+
+            .story-content {
+                padding: 23px;
+            }
+
+            .closing {
+                padding: 30px 20px;
+            }
+
+            .closing h2 {
+                font-size: 21px;
+            }
+
+            .logo img {
+                width: 85px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a href="/" class="logo">
+        <img src="{% static 'tracker/logo.png' %}"
+             alt="Giant Strides Online School">
+    </a>
+
+    <a href="/" class="home-link">
+        Return Home →
+    </a>
+</header>
+
+<main>
+
+    <!-- SUCCESS HERO -->
+
+    <section class="hero">
+
+        <div class="content">
+
+            <div class="success-icon">✓</div>
+
+            <div class="eyebrow">
+                REPORT SUCCESSFULLY SUBMITTED
+            </div>
+
+            <h1>
+                Thank You for
+                <span>Making a Difference.</span>
+            </h1>
+
+            <p class="intro">
+
+                {% if tutor_name %}
+                    Hello {{ tutor_name }},
+                {% else %}
+                    Hello Educator,
+                {% endif %}
+
+                your teaching assessment report has been
+                successfully submitted.
+
+                Thank you for taking the time to understand
+                your learner, evaluate their current academic
+                abilities and provide meaningful recommendations.
+
+                Every child learns differently. Your observations
+                help us understand where a learner is today
+                and how best to support where they want to go.
+
+                Your contribution is an important part of that journey.
+
+            </p>
+
+            {% if report_reference %}
+            <div class="report-reference">
+                <small>REPORT REFERENCE</small>
+                <strong>{{ report_reference }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="summary">
+
+                <div class="summary-item">
+                    <div class="summary-icon">📖</div>
+                    <div>
+                        <h3>Understanding the Learner</h3>
+                        <p>
+                            Your evaluation helps establish
+                            the student's current learning level
+                            and academic understanding.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="summary-item">
+                    <div class="summary-icon">⭐</div>
+                    <div>
+                        <h3>Recognising Strengths</h3>
+                        <p>
+                            Identifying what a child does well
+                            helps us build on their existing
+                            abilities and confidence.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="summary-item">
+                    <div class="summary-icon">🎯</div>
+                    <div>
+                        <h3>Planning the Next Steps</h3>
+                        <p>
+                            Your recommendations help guide
+                            the academic support and personalised
+                            learning approach a child may need.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- STORY PANEL -->
+
+        <div class="story-card">
+
+            <div class="story-image"></div>
+
+            <div class="story-content">
+
+                <h2>
+                    Every Child Has
+                    <span>Potential Waiting to Be Discovered.</span>
+                </h2>
+
+                <p>
+                    A child who struggles today can make
+                    meaningful progress with the right guidance.
+
+                    A child who lacks confidence can discover
+                    their abilities when someone takes the time
+                    to understand them.
+
+                    This is why assessment matters.
+                    It is not simply about identifying what
+                    a learner does not know; it is about
+                    discovering what they can become.
+                </p>
+
+                <div class="quote">
+                    "At Giant Strides, we believe that
+                    understanding every learner is the
+                    foundation of meaningful education."
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- WHAT HAPPENS NEXT -->
+
+    <section class="next-section">
+
+        <div class="section-heading">
+            <span>BEYOND THE ASSESSMENT</span>
+            <h2>What Happens Next?</h2>
+        </div>
+
+        <div class="steps">
+
+            <div class="step-card">
+                <div class="step-number">01</div>
+
+                <h3>Academic Review</h3>
+
+                <p>
+                    Our academic team will review your
+                    observations, evaluation and
+                    recommendations.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">02</div>
+
+                <h3>Learning Needs Identified</h3>
+
+                <p>
+                    The submitted report will help us
+                    understand the learner's strengths
+                    and areas requiring additional support.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">03</div>
+
+                <h3>Personalised Learning Direction</h3>
+
+                <p>
+                    Your feedback will contribute to
+                    determining suitable learning support
+                    and the next steps for the student.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CLOSING MESSAGE -->
+
+    <section class="closing">
+
+        <h2>
+            Thank You for Being Part of a Child's Journey.
+        </h2>
+
+        <p>
+            Teaching goes beyond explaining concepts
+            and completing lessons.
+
+            It is about recognising potential, understanding
+            individual needs and helping learners take
+            meaningful steps forward.
+
+            Thank you for contributing your knowledge,
+            experience and professional insight to the
+            Giant Strides learning community.
+        </p>
+
+        <a href="/" class="btn">
+            Return to Giant Strides →
+        </a>
+
+    </section>
+
+</main>
+
+<footer>
+    © {% now "Y" %}
+    <strong>Giant Strides Online School.</strong>
+    All Rights Reserved.
+    <br>
+    Empowering Learners. Inspiring Excellence.
+</footer>
+
+</body>
+</html>

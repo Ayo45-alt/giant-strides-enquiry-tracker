@@ -1,0 +1,546 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Enquiry Tracker{% endblock %} | Giant Strides</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #1a3de8;
+            --amber: #f5b301;
+            --page-bg: #f4f7fa;
+            --text: #1f2937;
+            --muted: #5b6577;
+            --border: #dbe2ea;
+            --white: #fff;
+            --shadow: 0 3px 14px rgba(31, 41, 55, .07);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            color: var(--text);
+            background: var(--page-bg);
+            font-family: "Outfit", sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        a { color: var(--blue); }
+        .site-header {
+            background: var(--white);
+            border-top: 6px solid var(--amber);
+            box-shadow: 0 2px 6px rgba(31, 41, 55, .17);
+        }
+        .header-inner {
+            min-height: 126px;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+        }
+        .brand img { display: block; width: auto; height: 80px; object-fit: contain; }
+        .staff-nav { margin-left: auto; display: flex; align-items: center; gap: 22px; }
+        .staff-nav a, .staff-nav button {
+            padding: 8px 0;
+            color: var(--muted);
+            background: none;
+            border: 0;
+            font: inherit;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .staff-nav a:hover, .staff-nav button:hover { color: var(--blue); }
+        .staff-nav form { margin: 0; }
+        main { width: min(100% - 48px, 1160px); margin: 40px auto 64px; }
+        .content-card {
+            padding: 42px;
+            background: var(--white);
+            border: 1px solid #e3eaf1;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+        .page-heading {
+            margin: 0 0 28px;
+            padding-bottom: 16px;
+            color: var(--blue);
+            border-bottom: 2px solid #edf1ff;
+            font-size: clamp(25px, 3vw, 32px);
+            line-height: 1.2;
+        }
+        .intro { margin: -2px 0 30px; color: var(--muted); font-size: 18px; }
+        .section-title { margin: 40px 0 22px; color: var(--text); font-size: 21px; }
+        .messages { margin: 0 0 24px; padding: 0; list-style: none; }
+        .message {
+            padding: 13px 16px;
+            color: #17653a;
+            background: #eaf8ef;
+            border: 1px solid #bce6c9;
+            border-radius: 10px;
+        }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 32px; }
+        .field { min-width: 0; }
+        .field.full { grid-column: 1 / -1; }
+        .field label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .help-text { margin: 7px 0 0; color: var(--muted); font-size: 14px; }
+        .required { color: #e3342f; }
+        .form-input {
+            width: 100%;
+            min-height: 54px;
+            padding: 14px 16px;
+            color: var(--text);
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font: inherit;
+        }
+        .form-input::placeholder { color: #8993a3; }
+        .form-input:focus {
+            border-color: var(--blue);
+            outline: 0;
+            box-shadow: 0 0 0 4px rgba(26, 61, 232, .12);
+        }
+        .error-list { margin: 6px 0 0; padding: 0; color: #c62828; list-style: none; font-size: 14px; }
+        .formset-errors { margin: 0 0 16px; }
+        .inline-help { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: center; }
+        .inline-help .help-text { margin: 0; }
+        @media (max-width: 520px) { .inline-help { grid-template-columns: 1fr; gap: 7px; } }
+        .child-count-select { min-height: 56px; font-size: 18px; }
+        .child-panels { display: grid; gap: 24px; }
+        .child-panel {
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-left: 4px solid #8da3ff;
+            border-radius: 12px;
+            background: #fbfcff;
+        }
+        .child-panel.is-hidden { display: none; }
+        .child-panel-title { margin: 0 0 18px; color: var(--blue); font-size: 18px; }
+        .subject-fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+        .subject-fieldset legend { margin-bottom: 8px; padding: 0; font-weight: 500; }
+        .subject-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        .subject-option { position: relative; min-width: 0; margin: 0; cursor: pointer; }
+        .subject-options .subject-option span { justify-content: center; }
+        .subject-option input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+        .subject-option span {
+            min-height: 44px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+        .subject-option input:checked + span {
+            color: var(--blue);
+            background: #eef2ff;
+            border-color: var(--blue);
+            box-shadow: inset 0 0 0 1px var(--blue);
+        }
+        .subject-option input:focus-visible + span {
+            outline: 3px solid rgba(26, 61, 232, .2);
+            outline-offset: 2px;
+        }
+        .field-wide { grid-column: 1 / -1; }
+        .form-card { max-width: 1040px; padding: 44px 52px; margin-left: auto; margin-right: auto; }
+        .subject-fieldset .help-text { margin: 0 0 8px; }
+        .day-options { gap: 12px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+        .day-options .subject-option span { min-height: 46px; padding: 8px 4px; justify-content: center; }
+        @media (max-width: 420px) { .day-options { gap: 5px; } .day-options .subject-option span { font-size: 14px; } }
+        .field .help-text.class-note { margin: 6px 0 0; }
+        .error-inline { display: block; margin-top: 4px; color: #c62828; font-size: 14px; }
+        .whatsapp-help {
+            margin: 0 0 22px; padding: 12px 16px; display: inline-flex; align-items: center; gap: 10px;
+            color: #0b6b3a; background: #e1f5e8; border: 1.5px solid #b7e4c7; border-radius: 12px;
+            font-weight: 500; text-decoration: none;
+        }
+        .whatsapp-help:hover { background: #d3efdd; }
+        .form-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; }
+        .button {
+            min-height: 48px;
+            padding: 11px 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            background: var(--blue);
+            border: 1px solid var(--blue);
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .button:hover { background: #142fc2; }
+        .button.secondary { color: var(--blue); background: var(--white); }
+        .button.secondary:hover { background: #f2f5ff; }
+        .honeypot-field {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        .honeypot {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+        }
+        .thank-you-card {
+            width: min(100%, 720px);
+            margin: 42px auto;
+            padding: 58px 54px;
+            text-align: center;
+        }
+        .thank-you-icon { width: 64px; height: 64px; margin: 0 auto 18px; display: block; }
+        .thank-you-heading { margin-bottom: 18px; }
+        .thank-you-copy { margin: 0 auto 28px; color: var(--muted); font-size: 19px; }
+        .plain-link { font-weight: 500; text-decoration: none; }
+        .plain-link:hover { text-decoration: underline; }
+        .login-card { width: min(100%, 520px); margin: 24px auto; }
+        .status-cards { margin: 0 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 12px; }
+        .status-card {
+            min-height: 92px;
+            padding: 15px 17px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text);
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+        .status-card:hover, .status-card.active { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(26, 61, 232, .1); }
+        .status-card-label { color: var(--muted); font-size: 14px; font-weight: 500; }
+        .status-card-count { color: var(--blue); font-size: 24px; font-weight: 700; line-height: 1.1; }
+        .staff-filters { margin: 0 0 22px; display: flex; align-items: end; gap: 14px; }
+        .staff-filters .field { flex: 1; }
+        .staff-filters .form-input { min-height: 48px; }
+        .staff-table-wrap { overflow-x: auto; }
+        .staff-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .staff-table th, .staff-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .staff-table th { color: var(--muted); font-size: 13px; font-weight: 600; white-space: nowrap; }
+        .staff-table tbody tr { cursor: pointer; }
+        .staff-table tbody tr:hover { background: #f8faff; }
+        .staff-table tbody tr.due-row { background: #fff8e6; }
+        .staff-table tbody tr.due-row:hover { background: #fff2cc; }
+        .staff-table a { color: var(--text); font-weight: 600; text-decoration: none; }
+        .staff-table a:hover { color: var(--blue); text-decoration: underline; }
+        .subject-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+        .subject-tag {
+            padding: 3px 8px;
+            display: inline-block;
+            color: #2848bb;
+            background: #edf1ff;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .status-pill { padding: 5px 9px; display: inline-block; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .status-new { color: #2454a6; background: #e8f0ff; }
+        .status-assessment_booked { color: #7a4700; background: #fff3cd; }
+        .status-assessed { color: #6340a5; background: #f0e9ff; }
+        .status-started { color: #17653a; background: #e1f5e8; }
+        .status-not_proceeding { color: #535b66; background: #e9edf2; }
+        .mobile-enquiry-list { display: none; }
+        .pagination { margin-top: 22px; display: flex; align-items: center; justify-content: center; gap: 18px; }
+        .pagination a { font-weight: 500; text-decoration: none; }
+        .pagination-current { color: var(--muted); }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+        .detail-item { min-width: 0; }
+        .detail-label { margin-bottom: 4px; color: var(--muted); font-size: 14px; }
+        .detail-value { overflow-wrap: anywhere; font-weight: 500; }
+        .detail-value a { text-decoration: none; }
+        .detail-value a:hover { text-decoration: underline; }
+        .staff-section { margin-top: 30px; }
+        .staff-section-title { margin: 0 0 16px; font-size: 20px; }
+        .siblings-box { padding: 18px; background: #f8faff; border: 1px solid var(--border); border-radius: 12px; }
+        .siblings-box ul { margin: 0; padding-left: 20px; }
+        .siblings-box li + li { margin-top: 7px; }
+        .siblings-box a { font-weight: 500; text-decoration: none; }
+        .sibling-empty { margin: 0; color: var(--muted); }
+        .quick-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .form-actions.inline { margin-top: 0; }
+        .empty-state { padding: 32px 16px; color: var(--muted); text-align: center; }
+        .staff-page .header-inner { min-height: 92px; }
+        .staff-page .brand img { height: 56px; }
+        .staff-page main { width: min(100% - 48px, 1300px); margin-top: 28px; }
+        .staff-list-page { width: 100%; }
+        .staff-list-heading {
+            margin: 0 0 18px;
+            padding: 0;
+            color: var(--text);
+            border: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        .staff-status-tabs {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: thin;
+        }
+        .staff-status-tab {
+            min-height: 44px;
+            padding: 9px 12px;
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 7px;
+            color: var(--muted);
+            border-bottom: 2px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .staff-status-tab:hover { color: var(--blue); }
+        .staff-status-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+        .staff-tab-count {
+            min-width: 21px;
+            height: 21px;
+            padding: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            background: #edf1f5;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+        }
+        .staff-status-tab.active .staff-tab-count { color: var(--blue); background: #e8edff; }
+        .staff-due-tab {
+            margin-left: auto;
+            padding: 7px 12px;
+            color: #805800;
+            background: #fff3cc;
+            border: 1px solid #f1d98a;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .staff-due-tab .staff-tab-count { color: #805800; background: rgba(245, 179, 1, .2); }
+        .staff-due-tab.active { color: #6f4c00; background: #ffe9a3; border-color: #e8c454; }
+        .staff-filters {
+            margin: 0 0 18px;
+            display: grid;
+            grid-template-columns: minmax(180px, 1.4fr) minmax(140px, 1fr) repeat(3, minmax(120px, .8fr)) auto;
+            align-items: end;
+            gap: 12px;
+        }
+        .staff-filters .field { min-width: 0; }
+        .staff-filters .field label { margin-bottom: 4px; color: var(--muted); font-size: 12px; }
+        .staff-filters .form-input { min-height: 44px; height: 44px; padding: 9px 12px; font-size: 14px; }
+        .staff-filters .button { min-height: 44px; height: 44px; padding: 9px 17px; font-size: 14px; }
+        .staff-table-panel {
+            overflow: hidden;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: none;
+        }
+        .staff-table-wrap { overflow-x: auto; }
+        .staff-table { font-size: 14px; }
+        .staff-table th, .staff-table td { padding: 10px 11px; }
+        .staff-table th {
+            color: var(--muted);
+            background: #fafbfd;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .045em;
+            text-transform: uppercase;
+        }
+        .staff-table tbody tr:hover { background: #f1f5f9; }
+        .staff-table tbody tr.due-row { background: #fffcf4; }
+        .staff-table tbody tr.due-row:hover { background: #fff7e5; }
+        .staff-table tbody tr.due-row td:first-child { border-left: 3px solid var(--amber); }
+        .staff-child-cell { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 7px; }
+        .staff-table a { font-weight: 700; }
+        .staff-table .status-pill { padding: 4px 8px; font-size: 11px; }
+        .staff-table-panel .mobile-enquiry-card { border-radius: 0; box-shadow: none; }
+        .staff-table-panel .mobile-enquiry-card + .mobile-enquiry-card { border-top: 0; }
+        .staff-table-panel .mobile-enquiry-card.due-row {
+            background: #fffcf4;
+            border-color: var(--border);
+            border-left: 3px solid var(--amber);
+        }
+        .staff-table-panel .mobile-enquiry-card:hover { background: #f1f5f9; }
+        .staff-list-page .pagination { margin: 18px 0 0; }
+        .stage-summary { margin: -18px 0 22px; color: var(--muted); font-size: 14px; }
+        .stage-actions { min-width: 124px; display: flex; align-items: center; gap: 7px; }
+        .stage-main-action { min-height: 34px; padding: 6px 10px; font-size: 12px; white-space: nowrap; }
+        .stage-menu { position: relative; }
+        .stage-menu summary {
+            padding: 6px 8px;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            list-style: none;
+            white-space: nowrap;
+        }
+        .stage-menu summary::-webkit-details-marker { display: none; }
+        .stage-menu summary::after { content: " ▾"; }
+        .stage-menu-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            z-index: 20;
+            min-width: 170px;
+            padding: 5px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            box-shadow: 0 8px 22px rgba(31, 41, 55, .14);
+        }
+        .stage-menu-options form { margin: 0; }
+        .stage-menu-options button {
+            width: 100%;
+            padding: 9px 10px;
+            color: var(--text);
+            background: transparent;
+            border: 0;
+            border-radius: 6px;
+            font: inherit;
+            font-size: 13px;
+            text-align: left;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .stage-menu-options button:hover { color: var(--blue); background: #f1f5f9; }
+        .stage-dialog {
+            width: min(100% - 32px, 440px);
+            padding: 24px;
+            color: var(--text);
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 16px 50px rgba(31, 41, 55, .24);
+        }
+        .stage-dialog::backdrop { background: rgba(15, 23, 42, .42); }
+        .stage-dialog-title { margin: 0 0 18px; color: var(--blue); font-size: 21px; }
+        .stage-dialog-field { margin-bottom: 16px; }
+        .stage-dialog-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+        .stage-dialog-actions .button { min-height: 42px; padding: 8px 15px; }
+        .stage-dialog-field[hidden] { display: none; }
+        .staff-list-page .staff-table-panel .mobile-enquiry-card {
+            margin: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .staff-list-page .staff-table-panel .mobile-enquiry-card.due-row {
+            border-left: 3px solid var(--amber);
+            background: #fffcf4;
+        }
+        .report-table-scroll { overflow-x: auto; }
+        .report-table-scroll .staff-table { min-width: 650px; }
+        .mobile-stage-duration { color: var(--muted); font-size: 12px; white-space: nowrap; }
+        .mobile-enquiry-name { color: var(--text); text-decoration: none; }
+        .mobile-enquiry-name:hover { color: var(--blue); text-decoration: underline; }
+        @media (max-width: 760px) {
+            .header-inner { min-height: auto; padding: 14px 20px; }
+            .brand img { height: 64px; }
+            main { width: min(100% - 28px, 1160px); margin-top: 24px; }
+            .content-card { padding: 26px 22px; }
+            .child-panel { padding: 18px; }
+            .thank-you-card { margin: 24px auto; padding: 42px 28px; }
+            .staff-table-wrap { display: none; }
+            .mobile-enquiry-list { display: grid; gap: 12px; }
+            .mobile-enquiry-card {
+                padding: 17px;
+                display: block;
+                color: var(--text);
+                background: var(--white);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                text-decoration: none;
+                box-shadow: var(--shadow);
+            }
+            .mobile-enquiry-card.due-row { background: #fff8e6; border-color: #f0d47a; }
+            .mobile-enquiry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+            .mobile-enquiry-name { font-weight: 600; }
+            .mobile-enquiry-parent { margin-top: 2px; color: var(--muted); font-size: 14px; }
+            .mobile-enquiry-meta { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px 14px; }
+            .mobile-meta-label { display: block; color: var(--muted); font-size: 12px; }
+            .mobile-meta-value { display: block; font-size: 14px; }
+            .staff-filters { align-items: stretch; flex-direction: column; }
+            .staff-filters .button { width: 100%; }
+            .subject-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .staff-page .header-inner { min-height: 78px; }
+            .staff-page main { width: min(100% - 28px, 1300px); margin-top: 20px; }
+            .staff-status-tabs { gap: 2px; }
+            .staff-status-tab { padding-right: 10px; padding-left: 10px; }
+            .staff-due-tab { margin-left: 8px; }
+            .staff-filters { grid-template-columns: 1fr; gap: 10px; }
+            .staff-filters .button { width: 100%; }
+            .staff-nav { flex-wrap: wrap; justify-content: flex-end; gap: 6px 10px; }
+            .staff-table-panel { border-radius: 12px; }
+            .stage-actions { margin-top: 12px; }
+            .stage-menu-options { right: auto; left: 0; }
+            .staff-list-page .staff-table-panel .mobile-enquiry-card { margin: 10px; }
+        }
+        @media (min-width: 761px) and (max-width: 1050px) {
+            .staff-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .header-inner { padding: 12px 16px; }
+            main { width: min(100% - 20px, 1160px); margin-top: 16px; }
+            .content-card { padding: 24px 18px; border-radius: 13px; }
+            .form-grid { grid-template-columns: 1fr; gap: 18px; }
+            .form-actions .button { width: 100%; }
+            .child-count-select { font-size: 16px; }
+            .thank-you-card { padding: 36px 22px; }
+            .staff-nav { gap: 14px; }
+            .staff-nav a, .staff-nav button { font-size: 14px; }
+            .status-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .detail-grid { grid-template-columns: 1fr; gap: 16px; }
+            .staff-page .header-inner { padding: 10px 16px; }
+        }
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    {% block page_layout %}
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="{% url 'tracker:enquiry_create' %}" aria-label="Giant Strides home">
+                <img src="{% static 'tracker/logo.png' %}" alt="Giant Strides Online School">
+            </a>
+            {% block header_navigation %}{% endblock %}
+        </div>
+    </header>
+    <main>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="message">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    {% endblock %}
+</body>
+</html>

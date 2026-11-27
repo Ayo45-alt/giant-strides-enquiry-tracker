@@ -1,0 +1,376 @@
+
+<!-- templates/recruitment/ads_responded.html -->
+{% extends "recruitment/base_recruitment.html" %}
+
+{% block title %}Tutor Applications{% endblock %}
+
+{% block recruitment_content %}
+
+<div class="gs-header">
+  <div>
+    <h1>👨‍🏫 Tutor Applications</h1>
+    <div class="gs-subtitle">
+      Review tutor applications, evaluate their experience, and approve suitable
+      candidates for student assessments.
+    </div>
+  </div>
+</div>
+
+{% for ad in ads %}
+<div class="gs-card" style="margin-bottom:1.5rem; overflow:hidden;">
+
+  <!-- Advertisement Header -->
+  <div class="gs-card-header" style="flex-wrap:wrap; gap:1rem;">
+    <div>
+      <div style="display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <strong style="font-size:1.05rem; color:#0f172a;">
+          {{ ad.ref_code }} — {{ ad.enquiry.child_name }}
+        </strong>
+
+        {% if ad.status == "sent" %}
+          <span class="gs-tag gs-tag-filled">Active Advertisement</span>
+        {% elif ad.status == "reversed" %}
+          <span class="gs-tag" style="background:#fee2e2; color:#991b1b;">Reversed</span>
+        {% else %}
+          <span class="gs-tag" style="background:#fef3c7; color:#92400e;">Pending Dispatch</span>
+        {% endif %}
+      </div>
+
+      <div style="color:#64748b; font-size:0.85rem; margin-top:0.4rem;">
+        🌍 {{ ad.enquiry.family.country|default:"Online" }}
+        <span style="margin:0 0.35rem;">•</span>
+        {{ ad.applications.count }} application{{ ad.applications.count|pluralize }}
+        <span style="margin:0 0.35rem;">•</span>
+        {{ ad.get_unassigned_subjects.count }} unfilled subject{{ ad.get_unassigned_subjects.count|pluralize }}
+      </div>
+    </div>
+
+    <a href="{% url 'recruitment:student_full_detail' ad.enquiry.id %}"
+       class="gs-btn gs-btn-outline">
+      View Student Profile →
+    </a>
+  </div>
+
+  <!-- Applications -->
+  <div style="overflow-x:auto;">
+    <table class="gs-table" style="min-width:850px;">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Tutor</th>
+          <th>Contact Details</th>
+          <th>Experience</th>
+          <th>Portfolio</th>
+          <th>Status / Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% with unassigned=ad.get_unassigned_subjects %}
+          {% for app in ad.applications.all %}
+          <tr>
+            <!-- Subject -->
+            <td>
+              <span class="gs-tag gs-tag-info">
+                {{ app.subject.name }}
+              </span>
+            </td>
+
+            <!-- Tutor -->
+            <td>
+              <strong style="color:#0f172a;">
+                {{ app.full_name }}
+              </strong>
+              <div style="font-size:0.75rem; color:#94a3b8; margin-top:0.2rem;">
+                Applied {{ app.applied_at|date:"M d, Y" }}
+              </div>
+            </td>
+
+            <!-- Contact -->
+            <td>
+              <div style="white-space:nowrap;">
+                <span>📱 {{ app.whatsapp_number }}</span>
+              </div>
+              <div style="font-size:0.8rem; color:#64748b; margin-top:0.25rem;">
+                ✉️ {{ app.email }}
+              </div>
+            </td>
+
+            <!-- Experience -->
+            <td>
+              <strong>{{ app.years_of_experience }}</strong>
+              year{{ app.years_of_experience|pluralize }}
+            </td>
+
+            <!-- Portfolio -->
+            <td>
+              <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+                {% if app.demo_video %}
+                  <a href="{{ app.demo_video }}"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     class="gs-btn gs-btn-outline">
+                    🎥 Demo
+                  </a>
+                {% endif %}
+
+                {% if app.cv %}
+                  <a href="{{ app.cv.url }}"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     class="gs-btn gs-btn-outline">
+                    📄 CV
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+
+            <!-- Status / Action -->
+            <td>
+              {% if app.is_approved %}
+
+                <div>
+                  <span class="gs-tag gs-tag-filled">
+                    ✅ Approved
+                  </span>
+                  <div style="font-size:0.78rem; color:#64748b; margin-top:0.35rem;">
+                    {{ app.assessment_date|date:"M d, Y" }}
+                    {% if app.assessment_time %}
+                      @ {{ app.assessment_time|time:"H:i" }}
+                    {% endif %}
+                  </div>
+                </div>
+
+              {% elif app.subject not in unassigned %}
+
+                <span style="color:#64748b; font-size:0.82rem;">
+                  🔒 Position Filled
+                </span>
+
+              {% elif ad.status != "sent" %}
+
+                <span style="color:#92400e; font-size:0.82rem;">
+                  ⚠️ Advertisement Not Active
+                </span>
+
+              {% else %}
+
+                <button
+                  type="button"
+                  class="gs-btn gs-btn-success"
+                  data-approve-url="{% url 'recruitment:approve_tutor' app.id %}"
+                  data-tutor="{{ app.full_name|escape }}"
+                  data-subject="{{ app.subject.name|escape }}"
+                  data-child="{{ ad.enquiry.child_name|escape }}"
+                  onclick="openApproveModal(this)"
+                >
+                  Approve & Schedule
+                </button>
+
+              {% endif %}
+            </td>
+          </tr>
+
+          {% endfor %}
+        {% endwith %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if not ad.applications.all %}
+    <div class="gs-card-body"
+         style="text-align:center; color:#64748b;">
+      No applications have been received for this advertisement.
+    </div>
+  {% endif %}
+
+</div>
+
+{% empty %}
+
+<div class="gs-card">
+  <div class="gs-card-body" style="text-align:center; padding:2.5rem 1rem;">
+    <div style="font-size:2rem; margin-bottom:0.75rem;">📭</div>
+    <strong style="display:block; color:#0f172a; margin-bottom:0.35rem;">
+      No tutor applications yet
+    </strong>
+    <span style="color:#64748b; font-size:0.875rem;">
+      Tutor applications will appear here when candidates respond to recruitment advertisements.
+    </span>
+  </div>
+</div>
+
+{% endfor %}
+
+
+<!-- Approval & Assessment Scheduling Modal -->
+<div
+  id="approveModal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="approveModalTitle"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.65);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:1rem;
+  "
+>
+  <div
+    style="
+      background:#fff;
+      border-radius:14px;
+      max-width:480px;
+      width:100%;
+      padding:1.5rem;
+      box-shadow:0 20px 50px rgba(0,0,0,0.2);
+      max-height:90vh;
+      overflow-y:auto;
+    "
+  >
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+      <h3 id="approveModalTitle"
+          style="margin:0; color:#0f172a; font-size:1.1rem;">
+        Approve Tutor
+      </h3>
+
+      <button
+        type="button"
+        onclick="closeApproveModal()"
+        aria-label="Close approval dialog"
+        style="
+          border:0;
+          background:#f1f5f9;
+          border-radius:8px;
+          width:32px;
+          height:32px;
+          cursor:pointer;
+          font-size:1.1rem;
+        "
+      >
+        &times;
+      </button>
+    </div>
+
+    <p id="modalSummary"
+       style="
+         font-size:0.875rem;
+         color:#475569;
+         line-height:1.6;
+         margin:1rem 0;
+         background:#f8fafc;
+         padding:0.85rem;
+         border-radius:8px;
+       ">
+    </p>
+
+    <form id="approveForm" method="POST">
+      {% csrf_token %}
+
+      <div style="margin-bottom:1rem;">
+        <label for="assessmentDate"
+               style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.35rem;">
+          Assessment Date
+        </label>
+
+        <input
+          id="assessmentDate"
+          type="date"
+          name="assessment_date"
+          required
+          style="width:100%; box-sizing:border-box; padding:0.7rem; border:1px solid #cbd5e1; border-radius:7px;"
+        >
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label for="assessmentTime"
+               style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.35rem;">
+          Assessment Time
+        </label>
+
+        <input
+          id="assessmentTime"
+          type="time"
+          name="assessment_time"
+          required
+          style="width:100%; box-sizing:border-box; padding:0.7rem; border:1px solid #cbd5e1; border-radius:7px;"
+        >
+      </div>
+        <div style="
+            margin-bottom:1.25rem;
+            padding:1rem;
+            background:#f0f7ff;
+            border:1px solid #cfe2ff;
+            border-radius:8px;
+        ">
+            <strong>Google Meet Link</strong>
+
+            <p style="margin:0.5rem 0 0;">
+                The student's permanent Google Meet link will be
+                generated or retrieved automatically during approval.
+                It will be included in the parent and tutor notifications.
+            </p>
+        </div>
+
+      <div style="display:flex; justify-content:flex-end; flex-wrap:wrap; gap:0.6rem;">
+        <button
+          type="button"
+          class="gs-btn gs-btn-outline"
+          onclick="closeApproveModal()"
+        >
+          Cancel
+        </button>
+
+        <button type="submit" class="gs-btn gs-btn-success">
+          Confirm & Send Notifications
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+
+<script>
+function openApproveModal(button) {
+  const modal = document.getElementById("approveModal");
+  const form = document.getElementById("approveForm");
+
+  const tutorName = button.dataset.tutor;
+  const subjectName = button.dataset.subject;
+  const childName = button.dataset.child;
+  const approveUrl = button.dataset.approveUrl;
+
+  document.getElementById("modalSummary").textContent =
+    `You are approving ${tutorName} for ${subjectName} with ${childName}. ` +
+    "The student's permanent Google Meet link will be generated or reused automatically, " +
+    "and the assessment details will be sent to the parent and approved tutor.";
+  form.action = approveUrl;
+
+  modal.style.display = "flex";
+  document.getElementById("assessmentDate").focus();
+}
+
+function closeApproveModal() {
+  document.getElementById("approveModal").style.display = "none";
+}
+
+document.getElementById("approveModal").addEventListener("click", function(event) {
+  if (event.target === this) {
+    closeApproveModal();
+  }
+});
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") {
+    closeApproveModal();
+  }
+});
+</script>
+
+{% endblock %}

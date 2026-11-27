@@ -1,0 +1,552 @@
+{% extends "tracker/staff/base.html" %}
+
+{% block title %}{{ stage_title }}{% endblock %}
+
+{% block content %}
+<section class="staff-list-page" data-list-status="{{ selected_status }}">
+    <div class="staff-heading-row">
+        <h1 class="staff-list-heading">{{ stage_title }}</h1>
+        <span class="staff-heading-count" id="staff-result-count">{{ page_obj.paginator.count }} enquir{{ page_obj.paginator.count|pluralize:"y,ies" }}</span>
+    </div>
+
+    <form class="staff-filters" method="get" id="staff-filters">
+        <input type="hidden" name="status" value="{{ selected_status }}">
+        {% if sort_key %}<input type="hidden" name="sort" value="{{ sort_key }}">{% endif %}
+        {% if sort_direction %}<input type="hidden" name="direction" value="{{ sort_direction }}">{% endif %}
+        <div class="field staff-filter-search">
+            <label for="enquiry-search">Search child, parent or phone</label>
+            <input class="form-input" id="enquiry-search" type="search" name="q" value="{{ search_query }}" placeholder="Child, parent or phone">
+        </div>
+        <button class="button secondary staff-download-button" type="submit" formaction="{% url 'staff:staff_download' %}">Download</button>
+        <div class="field staff-filter-subject">
+            <label for="subject-filter">Subject</label>
+            <select class="form-input" id="subject-filter" name="subject">
+                <option value="">All subjects</option>
+                {% for subject in subjects %}
+                    <option value="{{ subject.pk }}" {% if selected_subject_id == subject.pk|stringformat:"s" %}selected{% endif %}>{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <section class="staff-table-panel" aria-label="Enquiry results">
+        <div class="staff-table-wrap">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        {% for header in sort_headers %}
+                            <th scope="col">
+                                <a href="{{ header.url }}" class="staff-sort-link">
+                                    {{ header.label }}{% if header.active %}<span aria-hidden="true">{% if header.direction == "asc" %} ↑{% else %} ↓{% endif %}</span>{% endif %}
+                                </a>
+                            </th>
+                        {% endfor %}
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enquiry in enquiries %}
+                        <tr data-enquiry-id="{{ enquiry.pk }}" data-panel-url="{% url 'staff:staff_enquiry_panel' enquiry.pk %}" data-update-url="{% url 'staff:staff_enquiry_panel' enquiry.pk %}" data-child="{{ enquiry.child_name }}" data-parent="{{ enquiry.family.parent_name }}" data-phone="{{ enquiry.family.parent_phone }}" data-country="{{ enquiry.family.country }}" tabindex="0">
+                            <td>
+                                <div class="staff-child-cell">
+                                    <span class="staff-child-name">{{ enquiry.child_name }}</span>
+                                    {% if enquiry.reference %}<button type="button" class="ref-chip" data-copy-ref="{{ enquiry.reference }}" title="Click to copy">{{ enquiry.reference }}</button>{% endif %}
+                                    {% if enquiry.siblings %}<span class="staff-sibling-line">Sibling of {% for sibling in enquiry.siblings %}{% if not forloop.first %}{% if forloop.last %} and {% else %}, {% endif %}{% endif %}<a href="{% url 'staff:staff_detail' sibling.pk %}" data-sibling-panel data-enquiry-id="{{ sibling.pk }}" data-panel-url="{% url 'staff:staff_enquiry_panel' sibling.pk %}" data-update-url="{% url 'staff:staff_enquiry_panel' sibling.pk %}">{{ sibling.child_name }}</a>{% endfor %}</span>{% endif %}
+                                    <span class="staff-school-year">{{ enquiry.school_year }}</span>
+                                    <span class="subject-tags staff-child-subjects">{% for subject in enquiry.subjects.all %}<span class="subject-tag">{{ subject.name }}</span>{% endfor %}</span>
+                                    {% if enquiry.assessment_day %}<span class="staff-sheet-sub">Convenient: {{ enquiry.assessment_day }}</span>{% endif %}
+                                    {% if enquiry.proposed_classes %}<span class="staff-sheet-sub">Classes: {{ enquiry.proposed_classes }}</span>{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="staff-parent-name">{{ enquiry.family.parent_name }}</span>
+                                <a class="staff-parent-phone" href="tel:{{ enquiry.family.parent_phone }}">{{ enquiry.family.parent_phone }}</a>
+                                {% if enquiry.family.parent_email %}<a class="staff-sheet-sub" href="mailto:{{ enquiry.family.parent_email }}">{{ enquiry.family.parent_email }}</a>{% endif %}
+                                {% if enquiry.family.country %}<span class="staff-sheet-sub">📍 {{ enquiry.family.country }}</span>{% endif %}
+                            </td>
+
+                            {% if selected_status == "new" %}
+                                <td class="staff-date-cell">{{ enquiry.created|date:"j M" }}{% if enquiry.created|date:"Y" != today|date:"Y" %} {{ enquiry.created|date:"Y" }}{% endif %}</td>
+                                <td class="staff-waiting">{% if enquiry.waiting_too_long %}<span class="staff-waiting-dot"></span>{% endif %}{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}</td>
+                            {% elif selected_status == "assessment_booked" %}
+                                <td class="staff-date-cell">{% if enquiry.assessment_date %}{{ enquiry.assessment_date|date:"j M" }}{% if enquiry.assessment_date|date:"Y" != today|date:"Y" %} {{ enquiry.assessment_date|date:"Y" }}{% endif %}{% else %}<span class="staff-date-muted">Not set</span>{% endif %}</td>
+                                <td class="staff-date-cell">{% if enquiry.assessment_time %}{{ enquiry.assessment_time|time:"H:i" }}{% else %}<span class="staff-date-muted">—</span>{% endif %}</td>
+                                <td class="staff-waiting">{% if enquiry.waiting_too_long %}<span class="staff-waiting-dot"></span>{% endif %}{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}</td>
+                            {% elif selected_status == "assessed" %}
+                                <td class="staff-date-cell">{% if enquiry.assessment_date %}{{ enquiry.assessment_date|date:"j M" }}{% if enquiry.assessment_date|date:"Y" != today|date:"Y" %} {{ enquiry.assessment_date|date:"Y" }}{% endif %}{% else %}<span class="staff-date-muted">Not set</span>{% endif %}</td>
+                                <td class="staff-date-cell{% if enquiry.followup_due and enquiry.next_followup < today %} staff-date-overdue{% endif %}">{% if enquiry.next_followup == today %}Today{% elif enquiry.followup_due %}Overdue {{ enquiry.days_overdue }} day{{ enquiry.days_overdue|pluralize }}{% elif enquiry.next_followup %}{{ enquiry.next_followup|date:"j M" }}{% if enquiry.next_followup|date:"Y" != today|date:"Y" %} {{ enquiry.next_followup|date:"Y" }}{% endif %}{% else %}<span class="staff-date-muted">Not set</span>{% endif %}</td>
+                                <td class="staff-waiting">{% if enquiry.waiting_too_long %}<span class="staff-waiting-dot"></span>{% endif %}{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}</td>
+                            {% elif selected_status == "started" %}
+                                <td class="staff-date-cell">{% if enquiry.assessment_date %}{{ enquiry.assessment_date|date:"j M" }}{% if enquiry.assessment_date|date:"Y" != today|date:"Y" %} {{ enquiry.assessment_date|date:"Y" }}{% endif %}{% else %}<span class="staff-date-muted">Not set</span>{% endif %}</td>
+                                <td class="staff-date-cell">{% if enquiry.start_date %}{{ enquiry.start_date|date:"j M" }}{% if enquiry.start_date|date:"Y" != today|date:"Y" %} {{ enquiry.start_date|date:"Y" }}{% endif %}{% else %}<span class="staff-date-muted">Not set</span>{% endif %}</td>
+                            {% elif selected_status == "not_proceeding" %}
+                                <td class="staff-date-cell">{{ enquiry.status_changed_at|date:"j M" }}{% if enquiry.status_changed_at|date:"Y" != today|date:"Y" %} {{ enquiry.status_changed_at|date:"Y" }}{% endif %}</td>
+                                <td>{{ enquiry.not_proceeding_reason|default:"—" }}</td>
+                            {% elif selected_status == "followups_due" %}
+                                <td class="staff-date-cell">{% if enquiry.assessment_date %}{{ enquiry.assessment_date|date:"j M" }}{% if enquiry.assessment_date|date:"Y" != today|date:"Y" %} {{ enquiry.assessment_date|date:"Y" }}{% endif %}{% else %}<span class="staff-date-muted">Not set</span>{% endif %}</td>
+                                <td class="staff-date-cell staff-date-overdue">{% if enquiry.next_followup == today %}Today{% elif enquiry.next_followup %}Overdue {{ enquiry.days_overdue }} day{{ enquiry.days_overdue|pluralize }}{% elif enquiry.status == "new" %}Pending {{ enquiry.days_in_stage }} days{% else %}Due{% endif %}</td>
+                                <td class="staff-waiting">{% if enquiry.waiting_too_long %}<span class="staff-waiting-dot"></span>{% endif %}{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}</td>
+                                <td><span class="status-pill status-{{ enquiry.status }}">{{ enquiry.get_status_display }}</span></td>
+                            {% elif selected_status == "all" %}
+                                <td><span class="status-pill status-{{ enquiry.status }}">{{ enquiry.get_status_display }}</span></td>
+                                <td class="staff-date-cell">{{ enquiry.created|date:"j M" }}{% if enquiry.created|date:"Y" != today|date:"Y" %} {{ enquiry.created|date:"Y" }}{% endif %}</td>
+                                <td class="staff-waiting">{% if enquiry.status == "new" or enquiry.status == "assessment_booked" or enquiry.status == "assessed" %}{% if enquiry.waiting_too_long %}<span class="staff-waiting-dot"></span>{% endif %}{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}{% else %}—{% endif %}</td>
+                            {% endif %}
+
+                            <td>
+                                <div class="staff-row-actions">
+                                    {% if enquiry.status == "new" %}
+                                        <button class="button" type="button" data-open-stage-dialog data-stage-action="book_assessment" data-enquiry-id="{{ enquiry.pk }}">Book assessment</button>
+                                    {% elif enquiry.status == "assessment_booked" %}
+                                        <button class="button" type="button" data-row-action="stage">Mark assessed</button>
+                                    {% elif enquiry.status == "assessed" %}
+                                        <button class="button" type="button" data-row-action="stage">Mark started</button>
+                                        <a href="{% url 'recruitment:student_full_detail' enquiry.id %}"
+                                            style="display:inline-block; padding:0.35rem 0.7rem; background:#1e3a8a; color:#fff; border-radius:6px; font-size:0.8rem; font-weight:600; text-decoration:none;">
+                                            View Full Journey
+                                        </a>
+                                    {% elif enquiry.status == "not_proceeding" %}
+                                        <button class="button secondary" type="button" data-row-action="reopen">Reopen</button>
+                                    {% endif %}
+                                    <button class="button secondary" type="button" data-open-edit data-enquiry-id="{{ enquiry.pk }}">Edit</button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td class="empty-state" colspan="{{ column_count }}">No enquiries match this stage or these filters.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mobile-enquiry-list">
+            {% for enquiry in enquiries %}
+                <article class="mobile-enquiry-card" data-enquiry-id="{{ enquiry.pk }}" data-panel-url="{% url 'staff:staff_enquiry_panel' enquiry.pk %}" data-update-url="{% url 'staff:staff_enquiry_panel' enquiry.pk %}" data-child="{{ enquiry.child_name }}" data-parent="{{ enquiry.family.parent_name }}" data-phone="{{ enquiry.family.parent_phone }}" data-country="{{ enquiry.family.country }}" tabindex="0">
+                    <div class="staff-card-top">
+                        <div>
+                            <span class="mobile-enquiry-name">{{ enquiry.child_name }}</span>
+                            {% if enquiry.siblings %}<span class="staff-sibling-line">Sibling of {% for sibling in enquiry.siblings %}{% if not forloop.first %}{% if forloop.last %} and {% else %}, {% endif %}{% endif %}<a href="{% url 'staff:staff_detail' sibling.pk %}" data-sibling-panel data-enquiry-id="{{ sibling.pk }}" data-panel-url="{% url 'staff:staff_enquiry_panel' sibling.pk %}" data-update-url="{% url 'staff:staff_enquiry_panel' sibling.pk %}">{{ sibling.child_name }}</a>{% endfor %}</span>{% endif %}
+                            <span class="staff-school-year">{{ enquiry.school_year }}</span>
+                            <div class="mobile-enquiry-parent">{{ enquiry.family.parent_name }}<span class="staff-parent-phone">{{ enquiry.family.parent_phone }}</span></div>
+                            {% if enquiry.family.country %}<div class="staff-sheet-sub">📍 {{ enquiry.family.country }}</div>{% endif %}
+                            {% if selected_status == "all" or selected_status == "followups_due" %}<span class="status-pill status-{{ enquiry.status }}">{{ enquiry.get_status_display }}</span>{% endif %}
+                        </div>
+                        {% if enquiry.waiting_too_long %}<span class="staff-waiting-dot" aria-label="Waiting at least seven days"></span>{% endif %}
+                    </div>
+                    <div class="subject-tags staff-card-subjects">{% for subject in enquiry.subjects.all %}<span class="subject-tag">{{ subject.name }}</span>{% endfor %}</div>
+                    <div class="mobile-enquiry-meta">
+                        {% if selected_status == "new" %}
+                            <div class="staff-card-date">Received <strong>{{ enquiry.created|date:"j M" }}{% if enquiry.created|date:"Y" != today|date:"Y" %} {{ enquiry.created|date:"Y" }}{% endif %}</strong></div>
+                            <div class="staff-card-date">Pending <strong>{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}</strong></div>
+                        {% elif selected_status == "assessment_booked" %}
+                            <div class="staff-card-date">Assessment date <strong>{% if enquiry.assessment_date %}{{ enquiry.assessment_date|date:"j M" }}{% if enquiry.assessment_date|date:"Y" != today|date:"Y" %} {{ enquiry.assessment_date|date:"Y" }}{% endif %}{% else %}Not set{% endif %}</strong></div>
+                            <div class="staff-card-date">Time <strong>{% if enquiry.assessment_time %}{{ enquiry.assessment_time|time:"H:i" }}{% else %}—{% endif %}</strong></div>
+                            <div class="staff-card-date">Pending <strong>{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}</strong></div>
+                        {% elif selected_status == "assessed" or selected_status == "followups_due" %}
+                            <div class="staff-card-date">Assessment date <strong>{% if enquiry.assessment_date %}{{ enquiry.assessment_date|date:"j M" }}{% if enquiry.assessment_date|date:"Y" != today|date:"Y" %} {{ enquiry.assessment_date|date:"Y" }}{% endif %}{% else %}Not set{% endif %}</strong></div>
+                            <div class="staff-card-date{% if enquiry.followup_due and enquiry.next_followup < today %} staff-date-overdue{% endif %}">Next follow-up <strong>{% if enquiry.next_followup == today %}Today{% elif enquiry.followup_due %}Overdue {{ enquiry.days_overdue }} day{{ enquiry.days_overdue|pluralize }}{% elif enquiry.next_followup %}{{ enquiry.next_followup|date:"j M" }}{% if enquiry.next_followup|date:"Y" != today|date:"Y" %} {{ enquiry.next_followup|date:"Y" }}{% endif %}{% else %}Not set{% endif %}</strong></div>
+                            <div class="staff-card-date">Pending <strong>{{ enquiry.days_in_stage }} day{{ enquiry.days_in_stage|pluralize }}</strong></div>
+                        {% elif selected_status == "started" %}
+                            <div class="staff-card-date">Assessment date <strong>{% if enquiry.assessment_date %}{{ enquiry.assessment_date|date:"j M" }}{% if enquiry.assessment_date|date:"Y" != today|date:"Y" %} {{ enquiry.assessment_date|date:"Y" }}{% endif %}{% else %}Not set{% endif %}</strong></div>
+                            <div class="staff-card-date">Start date <strong>{% if enquiry.start_date %}{{ enquiry.start_date|date:"j M" }}{% if enquiry.start_date|date:"Y" != today|date:"Y" %} {{ enquiry.start_date|date:"Y" }}{% endif %}{% else %}Not set{% endif %}</strong></div>
+                        {% elif selected_status == "not_proceeding" %}
+                            <div class="staff-card-date">Date moved <strong>{{ enquiry.status_changed_at|date:"j M" }}{% if enquiry.status_changed_at|date:"Y" != today|date:"Y" %} {{ enquiry.status_changed_at|date:"Y" }}{% endif %}</strong></div>
+                            <div class="staff-card-date">Reason <strong>{{ enquiry.not_proceeding_reason|default:"—" }}</strong></div>
+                        {% else %}
+                            <div class="staff-card-date">Received <strong>{{ enquiry.created|date:"j M" }}{% if enquiry.created|date:"Y" != today|date:"Y" %} {{ enquiry.created|date:"Y" }}{% endif %}</strong></div>
+                        {% endif %}
+                        {% if enquiry.assessment_day %}<div class="staff-card-date">Convenient day <strong>{{ enquiry.assessment_day }}</strong></div>{% endif %}
+                        {% if enquiry.proposed_classes %}<div class="staff-card-date">Class times <strong>{{ enquiry.proposed_classes }}</strong></div>{% endif %}
+                    </div>
+                    <div class="staff-card-actions">
+                        {% if enquiry.status == "new" %}<button class="button" type="button" data-open-stage-dialog data-stage-action="book_assessment" data-enquiry-id="{{ enquiry.pk }}">Book assessment</button>
+                        {% elif enquiry.status == "assessment_booked" %}<button class="button" type="button" data-row-action="stage">Mark assessed</button>
+                        {% elif enquiry.status == "assessed" %}<button class="button" type="button" data-row-action="stage">Mark started</button>
+                        {% elif enquiry.status == "not_proceeding" %}<button class="button secondary" type="button" data-row-action="reopen">Reopen</button>{% endif %}
+                        <button class="button secondary" type="button" data-open-edit data-enquiry-id="{{ enquiry.pk }}">Edit</button>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">No enquiries match this stage or these filters.</div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav class="pagination" aria-label="Pagination">
+            {% if page_obj.has_previous %}<a href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+            <span class="pagination-current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+        </nav>
+    {% endif %}
+</section>
+{% include "tracker/staff/stage_dialog.html" with stage_post_url=request.path %}
+
+<!-- Clean Edit Modal -->
+<dialog id="clean-edit-dialog" class="clean-edit-dialog" aria-labelledby="edit-dialog-title">
+    <div class="clean-edit-header">
+        <div>
+            <h2 id="edit-dialog-title">Enquiry Details</h2>
+            <span class="status-pill" id="edit-dialog-status"></span>
+            <button type="button" class="ref-chip" id="edit-dialog-ref" data-copy-ref="" title="Click to copy" hidden></button>
+        </div>
+        <button class="clean-edit-close" type="button" id="edit-dialog-close" aria-label="Close dialog">×</button>
+    </div>
+    <form id="clean-edit-form" method="dialog">
+        <div class="clean-edit-grid">
+            <div class="clean-edit-section-title">What the parent submitted</div>
+            <div>
+                <label for="edit-parent-name">Parent Name</label>
+                <input class="form-input" id="edit-parent-name" type="text" required>
+            </div>
+            <div>
+                <label for="edit-parent-phone">Phone Number</label>
+                <input class="form-input" id="edit-parent-phone" type="tel" required>
+            </div>
+            <div>
+                <label for="edit-parent-email">Parent Email</label>
+                <input class="form-input" id="edit-parent-email" type="email">
+                <a id="edit-email-link" href="mailto:" style="display:none;">Email parent</a>
+            </div>
+            <div>
+                <label for="edit-country">Location / Country</label>
+                <input class="form-input" id="edit-country" type="text" placeholder="e.g. United Kingdom, Nigeria">
+            </div>
+
+            <div class="clean-edit-section-title">Child &amp; Enquiry Details</div>
+            <div>
+                <label for="edit-child-name">Child Name</label>
+                <input class="form-input" id="edit-child-name" type="text" required>
+            </div>
+            <div>
+                <label for="edit-school-year">School Year</label>
+                <input class="form-input" id="edit-school-year" type="text" placeholder="e.g. Year 5">
+            </div>
+            <div>
+                <label for="edit-assessment-day">Preferred Assessment Date</label>
+                <input class="form-input" id="edit-assessment-day" type="text" placeholder="e.g. Sat 28 Nov 2026">
+            </div>
+            <div>
+                <label for="edit-proposed-classes">Preferred Class Days &amp; Times</label>
+                <input class="form-input" id="edit-proposed-classes" type="text" placeholder="e.g. Mon &amp; Wed 4-5pm">
+            </div>
+            <div class="clean-edit-full">
+                <label>Subjects</label>
+                <div id="edit-subjects" class="subject-tags"></div>
+            </div>
+
+            <div class="clean-edit-section-title">Stage &amp; Tracking Dates</div>
+            <div>
+                <label for="edit-status">Stage</label>
+                <select class="form-input" id="edit-status">
+                    <option value="new">New</option>
+                    <option value="assessment_booked">Assessment booked</option>
+                    <option value="assessed">Assessed</option>
+                    <option value="started">Started</option>
+                    <option value="not_proceeding">Not proceeding</option>
+                </select>
+            </div>
+            <div>
+                <label for="edit-next-followup">Next Follow-up Date</label>
+                <input class="form-input" id="edit-next-followup" type="date">
+            </div>
+            <div>
+                <label for="edit-assessment-date">Assessment Date</label>
+                <input class="form-input" id="edit-assessment-date" type="date">
+            </div>
+            <div>
+                <label for="edit-assessment-time">Assessment Time</label>
+                <input class="form-input" id="edit-assessment-time" type="time">
+            </div>
+            <div>
+                <label for="edit-start-date">Start Date</label>
+                <input class="form-input" id="edit-start-date" type="date">
+            </div>
+            <div>
+                <label for="edit-reason">Not proceeding reason</label>
+                <input class="form-input" id="edit-reason" type="text" placeholder="Reason if not proceeding">
+            </div>
+
+            <div class="clean-edit-section-title">Notes</div>
+            <div class="clean-edit-full">
+                <textarea class="form-input" id="edit-notes" rows="3" placeholder="Add follow-up notes or internal comments..."></textarea>
+            </div>
+
+            <div class="clean-edit-full" id="edit-siblings-wrap" style="display:none;">
+                <label>Siblings</label>
+                <div id="edit-siblings"></div>
+            </div>
+        </div>
+
+        <div class="clean-edit-footer">
+            <button class="button secondary" type="button" id="edit-cancel">Cancel</button>
+            <button class="button" type="button" id="edit-save">Save Changes</button>
+        </div>
+    </form>
+</dialog>
+
+<div class="staff-toast" id="staff-toast" role="status" hidden></div>
+
+<script>
+(() => {
+    const filterForm = document.getElementById("staff-filters");
+    const search = document.getElementById("enquiry-search");
+    let searchTimer;
+    if (filterForm) {
+        search.addEventListener("input", () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => filterForm.requestSubmit(), 300);
+        });
+        filterForm.querySelectorAll("select").forEach((select) => {
+            select.addEventListener("change", () => filterForm.requestSubmit());
+        });
+    }
+
+    const csrf = document.cookie.split("; ").find((cookie) => cookie.startsWith("csrftoken="));
+    const csrfToken = csrf ? decodeURIComponent(csrf.split("=")[1]) : "";
+    const toast = document.getElementById("staff-toast");
+    let toastTimer;
+    function showToast(message) {
+        toast.textContent = message;
+        toast.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.hidden = true; }, 2800);
+    }
+    function updateNavigationCounts(counts) {
+        if (!counts) return;
+        Object.entries(counts).forEach(([key, value]) => {
+            document.querySelectorAll(`[data-nav-count="${key}"]`).forEach((element) => {
+                element.textContent = value;
+            });
+        });
+    }
+    async function sendUpdate(url, payload) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {"Content-Type": "application/json", "X-CSRFToken": csrfToken},
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not save this update.");
+        return data;
+    }
+    function removeEnquiryRows(row, counts) {
+        const id = row.dataset.enquiryId;
+        const visibleRows = document.querySelectorAll(
+            `tr[data-enquiry-id="${id}"], .mobile-enquiry-card[data-enquiry-id="${id}"]`
+        );
+        document.querySelectorAll(`[data-enquiry-id="${id}"]`).forEach((matchingRow) => matchingRow.remove());
+        updateNavigationCounts(counts);
+        if (!visibleRows.length) return;
+        const resultCount = document.getElementById("staff-result-count");
+        const currentCount = Number(resultCount.textContent.match(/\d+/)?.[0] || 0);
+        const nextCount = Math.max(0, currentCount - 1);
+        resultCount.textContent = `${nextCount} enquir${nextCount === 1 ? "y" : "ies"}`;
+    }
+
+    // Clean Edit Modal logic
+    const editDialog = document.getElementById("clean-edit-dialog");
+    const editClose = document.getElementById("edit-dialog-close");
+    const editCancel = document.getElementById("edit-cancel");
+    const editSave = document.getElementById("edit-save");
+    let currentEditUrl = "";
+    let currentEditRow = null;
+
+    function closeEditDialog() {
+        if (editDialog && editDialog.open) editDialog.close();
+    }
+    if (editClose) editClose.addEventListener("click", closeEditDialog);
+    if (editCancel) editCancel.addEventListener("click", closeEditDialog);
+    if (editDialog) {
+        editDialog.addEventListener("cancel", closeEditDialog);
+        editDialog.addEventListener("click", (e) => {
+            if (e.target === editDialog) closeEditDialog();
+        });
+    }
+
+    async function openEnquiryEdit(rowOrId) {
+        let url, row;
+        if (typeof rowOrId === "string" || typeof rowOrId === "number") {
+            row = document.querySelector(`tr[data-enquiry-id="${rowOrId}"], .mobile-enquiry-card[data-enquiry-id="${rowOrId}"]`);
+            url = row ? row.dataset.panelUrl : `/tracker/panel/${rowOrId}/`;
+        } else {
+            row = rowOrId.closest("[data-panel-url]");
+            url = row ? row.dataset.panelUrl : "";
+        }
+        if (!url) return;
+        currentEditUrl = url;
+        currentEditRow = row;
+
+        try {
+            const response = await fetch(url, { headers: { "Accept": "application/json" } });
+            if (!response.ok) throw new Error("Could not load enquiry details.");
+            const data = await response.json();
+
+            document.getElementById("edit-dialog-title").textContent = data.child_name || "Enquiry";
+            const statusPill = document.getElementById("edit-dialog-status");
+            statusPill.textContent = (data.status || "").replace("_", " ");
+            statusPill.className = `status-pill status-${data.status}`;
+            const dialogRef = document.getElementById("edit-dialog-ref");
+            dialogRef.hidden = !data.reference;
+            dialogRef.textContent = data.reference || "";
+            dialogRef.dataset.copyRef = data.reference || "";
+
+            document.getElementById("edit-parent-name").value = data.family?.name || "";
+            document.getElementById("edit-parent-phone").value = data.family?.phone || "";
+            document.getElementById("edit-parent-email").value = data.family?.email || "";
+            document.getElementById("edit-country").value = data.family?.country || "";
+
+            document.getElementById("edit-child-name").value = data.child_name || "";
+            document.getElementById("edit-school-year").value = data.school_year || "";
+            document.getElementById("edit-assessment-day").value = data.assessment_day || "";
+            document.getElementById("edit-proposed-classes").value = data.proposed_classes || "";
+
+            const subjectsWrap = document.getElementById("edit-subjects");
+            subjectsWrap.replaceChildren();
+            if (data.subjects && data.subjects.length) {
+                data.subjects.forEach(subj => {
+                    const tag = document.createElement("span");
+                    tag.className = "subject-tag";
+                    tag.textContent = subj;
+                    subjectsWrap.appendChild(tag);
+                });
+            } else {
+                const empty = document.createElement("span");
+                empty.className = "staff-muted";
+                empty.textContent = "None specified";
+                subjectsWrap.appendChild(empty);
+            }
+
+            document.getElementById("edit-status").value = data.status || "new";
+            document.getElementById("edit-next-followup").value = data.next_followup || "";
+            document.getElementById("edit-assessment-date").value = data.assessment_date || "";
+            document.getElementById("edit-assessment-time").value = data.assessment_time || "";
+            document.getElementById("edit-start-date").value = data.start_date || "";
+            document.getElementById("edit-reason").value = data.reason || "";
+            document.getElementById("edit-notes").value = data.notes || "";
+
+            const siblingsWrap = document.getElementById("edit-siblings-wrap");
+            const siblingsContainer = document.getElementById("edit-siblings");
+            siblingsContainer.replaceChildren();
+            if (data.siblings && data.siblings.length) {
+                siblingsWrap.style.display = "block";
+                data.siblings.forEach((sib, idx) => {
+                    if (idx > 0) siblingsContainer.appendChild(document.createTextNode(", "));
+                    const link = document.createElement("a");
+                    link.href = sib.detail_url;
+                    link.textContent = sib.name;
+                    link.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        openEnquiryEdit(sib.id);
+                    });
+                    siblingsContainer.appendChild(link);
+                });
+            } else {
+                siblingsWrap.style.display = "none";
+            }
+
+            editDialog.showModal();
+        } catch (err) {
+            showToast(err.message);
+        }
+    }
+
+    if (editSave) {
+        editSave.addEventListener("click", async () => {
+            if (!currentEditUrl) return;
+            const payload = {
+                action: "edit",
+                child_name: document.getElementById("edit-child-name").value,
+                school_year: document.getElementById("edit-school-year").value,
+                assessment_day: document.getElementById("edit-assessment-day").value,
+                proposed_classes: document.getElementById("edit-proposed-classes").value,
+                parent_name: document.getElementById("edit-parent-name").value,
+                parent_phone: document.getElementById("edit-parent-phone").value,
+                parent_email: document.getElementById("edit-parent-email").value,
+                country: document.getElementById("edit-country").value,
+                status: document.getElementById("edit-status").value,
+                assessment_date: document.getElementById("edit-assessment-date").value,
+                assessment_time: document.getElementById("edit-assessment-time").value,
+                start_date: document.getElementById("edit-start-date").value,
+                next_followup: document.getElementById("edit-next-followup").value,
+                not_proceeding_reason: document.getElementById("edit-reason").value,
+                notes: document.getElementById("edit-notes").value,
+            };
+
+            try {
+                const result = await sendUpdate(currentEditUrl, payload);
+                closeEditDialog();
+                showToast(result.message || "Changes saved");
+                updateNavigationCounts(result.navigation_counts);
+
+                const currentListStatus = document.querySelector(".staff-list-page")?.dataset.listStatus;
+                if (currentListStatus && currentListStatus !== "all" && currentListStatus !== payload.status && currentEditRow) {
+                    removeEnquiryRows(currentEditRow, result.navigation_counts);
+                } else if (currentEditRow) {
+                    const childNameEl = currentEditRow.querySelector(".staff-child-name, .mobile-enquiry-name");
+                    if (childNameEl) childNameEl.textContent = payload.child_name;
+                    const parentNameEl = currentEditRow.querySelector(".staff-parent-name, .mobile-enquiry-parent");
+                    if (parentNameEl && parentNameEl.firstChild) parentNameEl.firstChild.textContent = payload.parent_name;
+                    const parentPhoneEl = currentEditRow.querySelector(".staff-parent-phone");
+                    if (parentPhoneEl) parentPhoneEl.textContent = payload.parent_phone;
+                    const schoolYearEl = currentEditRow.querySelector(".staff-school-year");
+                    if (schoolYearEl) schoolYearEl.textContent = payload.school_year;
+                }
+            } catch (err) {
+                showToast(err.message);
+            }
+        });
+    }
+
+    document.querySelectorAll("[data-open-edit]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            openEnquiryEdit(button.dataset.enquiryId);
+        });
+    });
+
+    document.querySelectorAll("tr[data-panel-url], .mobile-enquiry-card[data-panel-url]").forEach((row) => {
+        row.addEventListener("click", (event) => {
+            if (event.target.closest("button, a, input, label, form, select")) return;
+            openEnquiryEdit(row);
+        });
+        row.addEventListener("keydown", (event) => {
+            if ((event.key === "Enter" || event.key === " ") && !event.target.closest("button, a, input, select")) {
+                event.preventDefault();
+                openEnquiryEdit(row);
+            }
+        });
+    });
+
+    document.querySelectorAll("[data-sibling-panel]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            openEnquiryEdit(link.dataset.enquiryId);
+        });
+    });
+
+    document.querySelectorAll("[data-row-action]").forEach((button) => {
+        button.addEventListener("click", async (event) => {
+            event.stopPropagation();
+            const row = button.closest("[data-update-url]");
+            try {
+                const result = await sendUpdate(row.dataset.updateUrl, {action: button.dataset.rowAction});
+                removeEnquiryRows(row, result.navigation_counts);
+                showToast(result.message);
+            } catch (error) { showToast(error.message); }
+        });
+    });
+})();
+    document.addEventListener("click", async (event) => {
+        const chip = event.target.closest("[data-copy-ref]");
+        if (!chip) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const ref = chip.dataset.copyRef;
+        try { await navigator.clipboard.writeText(ref); } catch (e) {}
+        chip.textContent = "Copied";
+        setTimeout(() => { chip.textContent = ref; }, 1200);
+    });
+</script>
+{% endblock %}

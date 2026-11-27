@@ -1,0 +1,103 @@
+<dialog class="stage-dialog" id="stage-dialog" data-open="{{ stage_dialog_open|yesno:'true,false' }}">
+    <form method="post" action="{{ stage_post_url }}{% if filter_query %}?{{ filter_query }}{% endif %}">
+        {% csrf_token %}
+        {{ stage_form.stage_action }}
+        <input type="hidden" name="enquiry_id" id="stage-enquiry-id" value="{{ stage_enquiry_id }}">
+        <h2 class="stage-dialog-title" id="stage-dialog-title">Update stage</h2>
+        {% if stage_form.non_field_errors %}
+            <ul class="error-list">{% for error in stage_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        {% endif %}
+        <div class="field stage-dialog-field" data-stage-field="book_assessment">
+            <label for="{{ stage_form.assessment_date.id_for_label }}">Assessment date</label>
+            {{ stage_form.assessment_date }}
+            {% if stage_form.assessment_date.errors %}
+                <ul class="error-list">{% for error in stage_form.assessment_date.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+        <div class="field stage-dialog-field" data-stage-field="book_assessment">
+            <label for="{{ stage_form.assessment_time.id_for_label }}">Time (optional)</label>
+            {{ stage_form.assessment_time }}
+            {% if stage_form.assessment_time.errors %}
+                <ul class="error-list">{% for error in stage_form.assessment_time.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+        <div class="field stage-dialog-field" data-stage-field="mark_assessed">
+            <label for="{{ stage_form.assessment_date.id_for_label }}">Assessment date</label>
+            {{ stage_form.assessment_date }}
+            {% if stage_form.assessment_date.errors %}
+                <ul class="error-list">{% for error in stage_form.assessment_date.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+        <div class="field stage-dialog-field" data-stage-field="mark_started">
+            <label for="{{ stage_form.start_date.id_for_label }}">Start date</label>
+            {{ stage_form.start_date }}
+            {% if stage_form.start_date.errors %}
+                <ul class="error-list">{% for error in stage_form.start_date.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+        <div class="field stage-dialog-field" data-stage-field="not_proceeding">
+            <label for="{{ stage_form.reason.id_for_label }}">Reason (optional)</label>
+            {{ stage_form.reason }}
+            {% if stage_form.reason.errors %}
+                <ul class="error-list">{% for error in stage_form.reason.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+        <div class="stage-dialog-actions">
+            <button class="button" type="submit">Confirm</button>
+            <button class="button secondary" type="button" data-close-stage-dialog>Cancel</button>
+        </div>
+    </form>
+</dialog>
+<script>
+    (function () {
+        const dialog = document.getElementById("stage-dialog");
+        const actionInput = dialog.querySelector('[name="stage_action"]');
+        const enquiryInput = document.getElementById("stage-enquiry-id");
+        const title = document.getElementById("stage-dialog-title");
+        const fields = dialog.querySelectorAll("[data-stage-field]");
+        const titles = {
+            book_assessment: "Book assessment",
+            mark_assessed: "Mark assessed",
+            mark_started: "Mark started",
+            not_proceeding: "Mark not proceeding"
+        };
+
+        function setAction(action) {
+            actionInput.value = action;
+            title.textContent = titles[action] || "Update stage";
+            fields.forEach((container) => {
+                const active = container.dataset.stageField === action;
+                container.hidden = !active;
+                container.querySelectorAll("input, select, textarea").forEach((input) => {
+                    input.disabled = !active;
+                    if (input.name === "assessment_date") {
+                        input.required = active && action === "book_assessment";
+                    } else if (input.name === "start_date") {
+                        input.required = active && action === "mark_started";
+                    }
+                });
+            });
+        }
+
+        document.querySelectorAll("[data-open-stage-dialog]").forEach((button) => {
+            button.addEventListener("click", () => {
+                setAction(button.dataset.stageAction);
+                enquiryInput.value = button.dataset.enquiryId;
+                dialog.showModal();
+            });
+        });
+        dialog.querySelector("[data-close-stage-dialog]").addEventListener("click", () => dialog.close());
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) {
+                dialog.close();
+            }
+        });
+
+        if (dialog.dataset.open === "true") {
+            setAction(actionInput.value);
+            dialog.showModal();
+        } else {
+            setAction("");
+        }
+    })();
+</script>

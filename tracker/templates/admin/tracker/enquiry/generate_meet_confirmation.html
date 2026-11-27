@@ -1,0 +1,64 @@
+
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+
+    <h1>Generate Google Meet link</h1>
+
+    <div class="module">
+        <p>
+            You are about to generate the student's reusable
+            Google Meet link.
+        </p>
+
+        <table>
+            <tr>
+                <th>Student</th>
+                <td>{{ enquiry.child_name }}</td>
+            </tr>
+            <tr>
+                <th>Reference</th>
+                <td>{{ enquiry.reference }}</td>
+            </tr>
+            <tr>
+                <th>Enquiry ID</th>
+                <td>{{ enquiry.pk }}</td>
+            </tr>
+        </table>
+
+        <p>
+            The system will create one private, non-blocking
+            recurring Calendar event series for this student.
+        </p>
+
+        <p>
+            No emails will be sent, and no tutors or students
+            will be invited automatically.
+        </p>
+
+        <p>
+            If a meeting already exists, the existing meeting
+            will be reused.
+        </p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="submit-row">
+            <input
+                type="submit"
+                name="confirm"
+                value="yes"
+                class="default"
+            >
+
+            <a href="{{ change_url }}" class="button cancel-link">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+</div>
+{% endblock %}
